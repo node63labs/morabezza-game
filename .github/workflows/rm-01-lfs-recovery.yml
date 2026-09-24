@@ -1,0 +1,86 @@
+name: RM-01 Git LFS clean recovery
+
+on:
+  push:
+    branches:
+      - docs/rm-01-repository-recovery-audit
+    paths:
+      - .github/workflows/rm-01-lfs-recovery.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clean-lfs-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Clean repository checkout and LFS download
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          lfs: true
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Verify Git and LFS state
+        shell: bash
+        run: |
+          set -euo pipefail
+          git --version
+          git lfs version
+          git rev-parse HEAD
+          git status --porcelain
+          git lfs ls-files --long
+          git lfs pull
+          git lfs fsck
+
+      - name: Verify every tracked Unreal binary against its LFS pointer
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import pathlib
+          import re
+          import subprocess
+
+          paths = [
+              p.decode("utf-8")
+              for p in subprocess.check_output(["git", "ls-files", "-z"]).split(b"\0")
+              if p and p.decode("utf-8").lower().endswith((".umap", ".uasset"))
+          ]
+          if len(paths) != 293:
+              raise SystemExit(f"RM-01 FAIL: expected 293 tracked Unreal binary paths; found {len(paths)}")
+          total_bytes = 0
+          for path in paths:
+              pointer = subprocess.check_output(["git", "show", f"HEAD:{path}"]).decode("utf-8")
+              match = re.fullmatch(
+                  r"version https://git-lfs.github.com/spec/v1\n"
+                  r"oid sha256:([0-9a-f]{64})\n"
+                  r"size ([0-9]+)\n?",
+                  pointer,
+              )
+              if not match:
+                  raise SystemExit(f"RM-01 FAIL: invalid LFS pointer: {path}")
+              expected_hash, expected_size = match.group(1), int(match.group(2))
+              actual = pathlib.Path(path)
+              if not actual.is_file():
+                  raise SystemExit(f"RM-01 FAIL: missing checkout payload: {path}")
+              digest = hashlib.sha256()
+              size = 0
+              with actual.open("rb") as handle:
+                  for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                      size += len(chunk)
+                      digest.update(chunk)
+              if size != expected_size or digest.hexdigest() != expected_hash:
+                  raise SystemExit(
+                      f"RM-01 FAIL: LFS integrity mismatch: {path}; "
+                      f"size {size}/{expected_size}"
+                  )
+              total_bytes += size
+          print(f"RM-01 PASS: {len(paths)} Unreal binary payloads verified against SHA-256 and size")
+          print(f"RM-01 PASS: {total_bytes} aggregate restored asset bytes")
+          PY
+          test -z "$(git status --porcelain)"
+          echo "RM-01 PASS: clean working tree after LFS recovery"
