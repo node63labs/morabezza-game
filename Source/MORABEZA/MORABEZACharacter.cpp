@@ -25,12 +25,14 @@
 #include "InputCoreTypes.h"
 
 #include "MORABEZAInteractionComponent.h"
+#include "MORABEZAContactActor.h"
 #include "MORABEZAHUD.h"
 
 
 AMORABEZACharacter::AMORABEZACharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
+    SetReplicates(true);
 
 
     /*
@@ -1216,4 +1218,33 @@ void AMORABEZACharacter::Interact()
             "MORABEZA INPUT: TryInteract() finished."
         )
     );
+}
+ 
+void AMORABEZACharacter::ServerTryInteract_Implementation(
+    AActor* RequestedTarget
+)
+{
+    if (!HasAuthority() || !IsValid(InteractionComponent))
+    {
+        return;
+    }
+
+    // The actor's owning connection is checked by Unreal's RPC routing.
+    // The interaction component independently rechecks controller,
+    // current pawn, target, range, obstruction, and test-contact owner.
+    InteractionComponent->ExecuteServerInteraction(RequestedTarget);
+}
+
+void AMORABEZACharacter::ClientPresentValidatedContact_Implementation(
+    AMORABEZAContactActor* Contact
+)
+{
+    if (!IsLocallyControlled() ||
+        !IsValid(Contact) ||
+        Contact->GetWorld() != GetWorld())
+    {
+        return;
+    }
+
+    Contact->PresentDialogueToLocalPlayer(this);
 }

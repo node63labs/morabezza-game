@@ -7,6 +7,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UMORABEZAInteractionComponent;
+class AMORABEZAContactActor;
 class UMORABEZAProceduralCharacterComponent;
 class UAnimationAsset;
 
@@ -29,6 +30,16 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Interaction")
     void Interact();
+
+    // Called only by the owning player. The server resolves and revalidates
+    // every request; the passed actor is an untrusted candidate.
+    UFUNCTION(Server, Reliable)
+    void ServerTryInteract(AActor* RequestedTarget);
+
+    // Cosmetic dialogue acknowledgement for an accepted test contact.
+    // Never grants items, currency, missions, or other game-domain state.
+    UFUNCTION(Client, Reliable)
+    void ClientPresentValidatedContact(AMORABEZAContactActor* Contact);
 
 protected:
 

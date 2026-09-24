@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "MORABEZAHUD.h"
+#include "MORABEZACharacter.h"
 
 #include "UObject/ConstructorHelpers.h"
 
@@ -87,107 +88,88 @@ void AMORABEZAContactActor::Interact_Implementation(
     AActor* Interactor
 )
 {
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA CONTACT: %s interacted / Mission: %s"
-        ),
-        *ContactName.ToString(),
-        *MissionId.ToString()
-    );
-
-    if (!DialogueComponent)
+    // A local client may never execute a game-domain interaction itself.
+    // This prototype's accepted effect is an owner-only UI acknowledgement.
+    if (!HasAuthority() || !IsValid(DialogueComponent))
     {
-        UE_LOG(
-            LogTemp,
-            Error,
-            TEXT(
-                "MORABEZA CONTACT: DialogueComponent is NULL."
-            )
-        );
-
         return;
     }
 
-    // Resolve the interacting pawn's controller, not an unrelated player.
-    APlayerController* PlayerController = nullptr;
-    if (APawn* InteractingPawn = Cast<APawn>(Interactor))
-    {
-        PlayerController =
-            Cast<APlayerController>(InteractingPawn->GetController());
-    }
-    else if (IsValid(Interactor))
-    {
-        PlayerController =
-            Cast<APlayerController>(Interactor->GetInstigatorController());
-    }
+    APawn* InteractingPawn = Cast<APawn>(Interactor);
+    APlayerController* PlayerController =
+        IsValid(InteractingPawn)
+            ? Cast<APlayerController>(InteractingPawn->GetController())
+            : nullptr;
 
-    if (!IsValid(PlayerController))
+    if (!IsValid(PlayerController) ||
+        (GetOwner() != nullptr && GetOwner() != PlayerController))
     {
-        UE_LOG(
-            LogTemp,
-            Warning,
-            TEXT("MORABEZA CONTACT: No interacting player; dialogue refused.")
-        );
         return;
     }
 
-    // This development test contact is owned by one connection. A
-    // world-placed, unowned contact retains its existing local dialogue path.
-    if (GetOwner() != nullptr && GetOwner() != PlayerController)
+    if (MissionId == FName(TEXT("TEST_INTERACTION")) &&
+        GetOwner() != PlayerController)
     {
-        UE_LOG(
-            LogTemp,
-            Warning,
-            TEXT("MORABEZA CONTACT: Wrong owner; dialogue refused.")
-        );
         return;
     }
 
-    if (MissionId == FName(TEXT("TEST_INTERACTION")) && GetOwner() == nullptr)
+    if (PlayerController->IsLocalController())
     {
-        UE_LOG(
-            LogTemp,
-            Warning,
-            TEXT("MORABEZA CONTACT: Missing test owner; dialogue refused.")
-        );
+        // Standalone/listen-server owner: local UI, no network round trip.
+        PresentDialogueToLocalPlayer(Interactor);
         return;
     }
 
-    // Dialogue widgets exist only on the owning client, not a dedicated
-    // server. This local UI path grants no authoritative gameplay result.
-    if (!PlayerController->IsLocalController())
+    // On a dedicated server there is no client HUD. Send a cosmetic
+    // notification on the validated player's possessed character.
+    if (AMORABEZACharacter* PlayerCharacter =
+            Cast<AMORABEZACharacter>(InteractingPawn))
+    {
+        if (GetIsReplicated())
+        {
+            PlayerCharacter->ClientPresentValidatedContact(this);
+        }
+    }
+}
+
+void AMORABEZAContactActor::PresentDialogueToLocalPlayer(
+    AActor* Interactor
+)
+{
+    if (!IsValid(DialogueComponent))
+    {
+        return;
+    }
+
+    APawn* InteractingPawn = Cast<APawn>(Interactor);
+    APlayerController* PlayerController =
+        IsValid(InteractingPawn)
+            ? Cast<APlayerController>(InteractingPawn->GetController())
+            : nullptr;
+
+    if (!IsValid(PlayerController) ||
+        !PlayerController->IsLocalController() ||
+        (GetOwner() != nullptr && GetOwner() != PlayerController))
+    {
+        return;
+    }
+
+    if (MissionId == FName(TEXT("TEST_INTERACTION")) &&
+        GetOwner() != PlayerController)
     {
         return;
     }
 
     AMORABEZAHUD* HUD =
-        Cast<AMORABEZAHUD>(
-            PlayerController->GetHUD()
-        );
+        Cast<AMORABEZAHUD>(PlayerController->GetHUD());
 
-    if (!HUD)
+    if (!IsValid(HUD))
     {
-        UE_LOG(
-            LogTemp,
-            Error,
-            TEXT(
-                "MORABEZA CONTACT: MORABEZAHUD unavailable."
-            )
-        );
-
         return;
     }
 
-    /*
-     * ============================================================
-     * CONNECT DIALOGUE TO HUD
-     * ============================================================
-     *
-     * The HUD owns the single authoritative dialogue UI.
-     */
-
+    // This actor carries only fixed prototype dialogue. Do not call an
+    // interaction interface or modify authoritative gameplay state here.
     DialogueComponent->OnDialogueLineChanged.RemoveAll(HUD);
     DialogueComponent->OnDialogueFinished.RemoveAll(HUD);
 
@@ -195,47 +177,12 @@ void AMORABEZAContactActor::Interact_Implementation(
         HUD,
         &AMORABEZAHUD::HandleDialogueLineChanged
     );
-
     DialogueComponent->OnDialogueFinished.AddDynamic(
         HUD,
         &AMORABEZAHUD::HandleDialogueFinished
     );
 
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA CONTACT: Dialogue connected to HUD."
-        )
-    );
-
-    /*
-     * ============================================================
-     * SET ACTIVE DIALOGUE COMPONENT
-     * ============================================================
-     *
-     * The HUD needs to know which dialogue component should
-     * receive subsequent E-key advance commands.
-     */
-
-    HUD->SetActiveDialogueComponent(
-        DialogueComponent
-    );
-
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA CONTACT: Active dialogue component assigned to HUD."
-        )
-    );
-
-    /*
-     * ============================================================
-     * START DIALOGUE
-     * ============================================================
-     */
-
+    HUD->SetActiveDialogueComponent(DialogueComponent);
     DialogueComponent->StartDialogue();
 }
 

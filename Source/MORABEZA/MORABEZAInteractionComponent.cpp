@@ -1,8 +1,11 @@
 #include "MORABEZAInteractionComponent.h"
 
 #include "MORABEZAInteractable.h"
+#include "MORABEZACharacter.h"
+#include "MORABEZAContactActor.h"
 
 #include "GameFramework/Character.h"
+#include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
 
@@ -107,7 +110,9 @@ void UMORABEZAInteractionComponent::UpdateInteractionTarget()
     ACharacter* Character =
         Cast<ACharacter>(GetOwner());
 
-    if (!Character)
+    // Client-side target detection is only a UI hint; remote simulated pawns
+    // must not trace, broadcast prompts, or initiate interactions.
+    if (!Character || !Character->IsLocallyControlled())
     {
         SetInteractionTarget(nullptr);
         return;
@@ -249,6 +254,23 @@ void UMORABEZAInteractionComponent::UpdateInteractionTarget()
         return;
     }
 
+    // Client prompt for the networked test slice must not suggest
+    // authority to interact with another player's private test contact
+    // or an unapproved world actor. Server validation remains mandatory.
+    if (World->GetNetMode() != NM_Standalone)
+    {
+        const AMORABEZAContactActor* Contact =
+            Cast<AMORABEZAContactActor>(HitActor);
+        if (!IsValid(Contact) ||
+            Contact->MissionId != FName(TEXT("TEST_INTERACTION")) ||
+            Contact->GetOwner() != Character->GetController() ||
+            !Contact->GetIsReplicated())
+        {
+            SetInteractionTarget(nullptr);
+            return;
+        }
+    }
+
     /*
      * ============================================================
      * PLAYER DISTANCE CHECK
@@ -273,54 +295,178 @@ void UMORABEZAInteractionComponent::UpdateInteractionTarget()
     SetInteractionTarget(HitActor);
 }
 
+
 void UMORABEZAInteractionComponent::TryInteract()
 {
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA INTERACTION: E pressed - TryInteract called."
-        )
-    );
+    AMORABEZACharacter* Character =
+        Cast<AMORABEZACharacter>(GetOwner());
 
-    /*
-     * Refresh the target immediately before interaction.
-     */
-
-    UpdateInteractionTarget();
-
-    AActor* Target =
-        CurrentTarget.Get();
-
-    if (
-        Target &&
-        Target->GetClass()->ImplementsInterface(
-            UMORABEZAInteractable::StaticClass()
-        )
-    )
+    if (!IsValid(Character) || !Character->IsLocallyControlled())
     {
-        UE_LOG(
-            LogTemp,
-            Warning,
-            TEXT(
-                "MORABEZA INTERACTION: Executing interaction on %s."
-            ),
-            *Target->GetName()
-        );
-
-        IMORABEZAInteractable::Execute_Interact(
-            Target,
-            GetOwner()
-        );
-
         return;
     }
 
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA INTERACTION: No valid target."
-        )
+    // The local trace selects a candidate for the UI. The server will NOT
+    // trust this cached target, the local hit result, or client editables.
+    UpdateInteractionTarget();
+
+    AActor* RequestedTarget = CurrentTarget.Get();
+    if (!IsValid(RequestedTarget))
+    {
+        return;
+    }
+
+    if (Character->HasAuthority())
+    {
+        // Standalone or locally controlled listen-server player.
+        ExecuteServerInteraction(RequestedTarget);
+    }
+    else
+    {
+        // The RPC is on the possessed, replicated character; only its
+        // owning connection may invoke it. The server validates the target.
+        Character->ServerTryInteract(RequestedTarget);
+    }
+}
+
+void UMORABEZAInteractionComponent::ExecuteServerInteraction(
+    AActor* RequestedTarget
+)
+{
+    AMORABEZACharacter* Character =
+        Cast<AMORABEZACharacter>(GetOwner());
+
+    if (!IsValid(Character) || !Character->HasAuthority())
+    {
+        return;
+    }
+
+    APlayerController* PlayerController =
+        Cast<APlayerController>(Character->GetController());
+
+    if (!IsValid(PlayerController) ||
+        PlayerController->GetPawn() != Character)
+    {
+        return;
+    }
+
+    UWorld* World = GetWorld();
+    if (!IsValid(World))
+    {
+        return;
+    }
+
+    // Rate limiting occurs on the server, independently of client input.
+    // No durable inventory/reward action is allowed through this prototype.
+    const double Now = World->GetTimeSeconds();
+    if (Now - LastServerInteractionSeconds < 0.35)
+    {
+        return;
+    }
+    LastServerInteractionSeconds = Now;
+
+    if (!IsValid(RequestedTarget) ||
+        RequestedTarget == Character ||
+        RequestedTarget->GetWorld() != World ||
+        !RequestedTarget->GetClass()->ImplementsInterface(
+            UMORABEZAInteractable::StaticClass()
+        ))
+    {
+        return;
+    }
+
+    // The first networked slice accepts ONLY each player's owner-scoped,
+    // replicated test contact. This does not grant arbitrary Blueprint
+    // interactables authority over rewards, missions, or inventory.
+    if (World->GetNetMode() != NM_Standalone)
+    {
+        const AMORABEZAContactActor* Contact =
+            Cast<AMORABEZAContactActor>(RequestedTarget);
+
+        if (!IsValid(Contact) ||
+            Contact->MissionId != FName(TEXT("TEST_INTERACTION")) ||
+            Contact->GetOwner() != PlayerController ||
+            !Contact->GetIsReplicated())
+        {
+            return;
+        }
+    }
+
+    // InteractionDistance can be modified locally for UI purposes.
+    // The authoritative server imposes an independent hard cap.
+    if (!FMath::IsFinite(InteractionDistance))
+    {
+        return;
+    }
+
+    const float MaxDistance =
+        FMath::Min(InteractionDistance, 350.0f);
+
+    if (MaxDistance <= 0.0f ||
+        FVector::DistSquared(
+            Character->GetActorLocation(),
+            RequestedTarget->GetActorLocation()
+        ) > FMath::Square(MaxDistance))
+    {
+        return;
+    }
+
+    FVector Forward = Character->GetActorForwardVector();
+    Forward.Z = 0.0f;
+    if (!Forward.Normalize())
+    {
+        return;
+    }
+
+    const FVector Start =
+        Character->GetActorLocation() + FVector(0.0f, 0.0f, 60.0f);
+    const FVector End = Start + Forward * MaxDistance;
+
+    FCollisionQueryParams Params(
+        SCENE_QUERY_STAT(MORABEZAServerInteraction),
+        true,
+        Character
+    );
+    Params.bTraceComplex = true;
+
+    FHitResult SweepHit;
+    const bool bFound = World->SweepSingleByChannel(
+        SweepHit,
+        Start,
+        End,
+        FQuat::Identity,
+        ECC_Visibility,
+        FCollisionShape::MakeSphere(65.0f),
+        Params
+    );
+
+    // A candidate must be the *first* blocking actor found by the
+    // authoritative server; a client-supplied pointer alone is never enough.
+    if (!bFound || SweepHit.GetActor() != RequestedTarget)
+    {
+        return;
+    }
+
+    // Prevent interactions through a thin obstacle that a forgiving sphere
+    // sweep could otherwise reach around.
+    FHitResult LineHit;
+    const bool bLineBlocked = World->LineTraceSingleByChannel(
+        LineHit,
+        Start,
+        SweepHit.ImpactPoint,
+        ECC_Visibility,
+        Params
+    );
+    if (bLineBlocked && LineHit.GetActor() != RequestedTarget)
+    {
+        return;
+    }
+
+    // Only the server invokes an interface that could eventually carry
+    // gameplay effects. In this slice, its only networked implementation
+    // is a dev contact that sends an owner-only cosmetic dialogue response.
+    IMORABEZAInteractable::Execute_Interact(
+        RequestedTarget,
+        Character
     );
 }
