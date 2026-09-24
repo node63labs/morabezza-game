@@ -491,102 +491,9 @@ void AMORABEZACharacter::BeginPlay()
     );
 
 
-    /*
-     * ============================================================
-     * ENHANCED INPUT SUBSYSTEM
-     * ============================================================
-     */
-
-    APlayerController* PlayerController =
-        Cast<APlayerController>(
-            GetController()
-        );
-
-    if (PlayerController)
-    {
-        ULocalPlayer* LocalPlayer =
-            PlayerController->GetLocalPlayer();
-
-        if (LocalPlayer)
-        {
-            UEnhancedInputLocalPlayerSubsystem*
-                InputSubsystem =
-                    LocalPlayer->GetSubsystem<
-                        UEnhancedInputLocalPlayerSubsystem
-                    >();
-
-            if (InputSubsystem)
-            {
-                /*
-                 * Remove previous contexts.
-                 */
-                InputSubsystem->ClearAllMappings();
-
-
-                /*
-                 * Add MORABEZA V1 context.
-                 */
-                if (InputMappingContext)
-                {
-                    InputSubsystem->AddMappingContext(
-                        InputMappingContext,
-                        0
-                    );
-
-                    UE_LOG(
-                        LogTemp,
-                        Warning,
-                        TEXT(
-                            "MORABEZA INPUT: Mapping context ACTIVE."
-                        )
-                    );
-                }
-                else
-                {
-                    UE_LOG(
-                        LogTemp,
-                        Error,
-                        TEXT(
-                            "MORABEZA INPUT ERROR: "
-                            "InputMappingContext is NULL."
-                        )
-                    );
-                }
-            }
-            else
-            {
-                UE_LOG(
-                    LogTemp,
-                    Error,
-                    TEXT(
-                        "MORABEZA INPUT ERROR: "
-                        "Enhanced Input subsystem unavailable."
-                    )
-                );
-            }
-        }
-        else
-        {
-            UE_LOG(
-                LogTemp,
-                Error,
-                TEXT(
-                    "MORABEZA INPUT ERROR: LocalPlayer unavailable."
-                )
-            );
-        }
-    }
-    else
-    {
-        UE_LOG(
-            LogTemp,
-            Error,
-            TEXT(
-                "MORABEZA INPUT ERROR: PlayerController unavailable."
-            )
-        );
-    }
-
+    // Possession may not have arrived yet. This local-only helper is safe
+    // here and is retried when the owning pawn is restarted or replicated.
+    RefreshLocalInputMapping();
 
     /*
      * ============================================================
@@ -648,6 +555,94 @@ void AMORABEZACharacter::BeginPlay()
     );
 }
 
+
+void AMORABEZACharacter::PawnClientRestart()
+{
+    Super::PawnClientRestart();
+
+    // Unreal invokes this on the owning client when the pawn restarts.
+    // A BeginPlay-only controller lookup can miss late possession.
+    RefreshLocalInputMapping();
+}
+
+void AMORABEZACharacter::OnRep_Controller()
+{
+    Super::OnRep_Controller();
+
+    // Reconcile both receiving and losing a replicated controller.
+    RefreshLocalInputMapping();
+}
+
+void AMORABEZACharacter::EndPlay(
+    const EEndPlayReason::Type EndPlayReason
+)
+{
+    UnregisterLocalInputMapping();
+    Super::EndPlay(EndPlayReason);
+}
+
+void AMORABEZACharacter::UnregisterLocalInputMapping()
+{
+    if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
+            RegisteredInputSubsystem.Get())
+    {
+        if (IsValid(InputMappingContext) &&
+            Subsystem->HasMappingContext(InputMappingContext))
+        {
+            Subsystem->RemoveMappingContext(InputMappingContext);
+        }
+    }
+
+    RegisteredInputSubsystem.Reset();
+}
+
+void AMORABEZACharacter::RefreshLocalInputMapping()
+{
+    UEnhancedInputLocalPlayerSubsystem* DesiredSubsystem = nullptr;
+
+    // Server pawns and other players' simulated proxies never manipulate
+    // the local player's Enhanced Input subsystem.
+    if (IsLocallyControlled())
+    {
+        if (APlayerController* PlayerController =
+                Cast<APlayerController>(GetController()))
+        {
+            if (ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer())
+            {
+                DesiredSubsystem =
+                    LocalPlayer->GetSubsystem<
+                        UEnhancedInputLocalPlayerSubsystem
+                    >();
+            }
+        }
+    }
+
+    UEnhancedInputLocalPlayerSubsystem* PreviousSubsystem =
+        RegisteredInputSubsystem.Get();
+
+    // On unpossession or local-player changes, remove only THIS pawn's
+    // mapping context. Never clear contexts owned by menus, vehicles, etc.
+    if (PreviousSubsystem &&
+        (PreviousSubsystem != DesiredSubsystem ||
+         !IsValid(InputMappingContext)))
+    {
+        UnregisterLocalInputMapping();
+    }
+
+    if (!IsValid(DesiredSubsystem) || !IsValid(InputMappingContext))
+    {
+        return;
+    }
+
+    // PawnClientRestart / OnRep_Controller may run more than once.
+    // A stable context should be installed exactly once per subsystem.
+    if (!DesiredSubsystem->HasMappingContext(InputMappingContext))
+    {
+        DesiredSubsystem->AddMappingContext(InputMappingContext, 0);
+    }
+
+    RegisteredInputSubsystem = DesiredSubsystem;
+}
 
 /*
  * ================================================================
@@ -804,6 +799,10 @@ void AMORABEZACharacter::SetupPlayerInputComponent(
      * FINAL INPUT DEBUG
      * ============================================================
      */
+
+    // Input components and controllers can be initialized in either order.
+    // This is idempotent and never clears other input mapping contexts.
+    RefreshLocalInputMapping();
 
     UE_LOG(
         LogTemp,
