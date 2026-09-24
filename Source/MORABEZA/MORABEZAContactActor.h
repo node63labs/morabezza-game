@@ -19,6 +19,10 @@ public:
 
     AMORABEZAContactActor();
 
+    virtual void GetLifetimeReplicatedProps(
+        TArray<FLifetimeProperty>& OutLifetimeProps
+    ) const override;
+
     virtual void Interact_Implementation(
         AActor* Interactor
     ) override;
@@ -41,6 +45,7 @@ public:
     TObjectPtr<UMORABEZADialogueComponent> DialogueComponent;
 
     UPROPERTY(
+        Replicated,
         EditAnywhere,
         BlueprintReadWrite,
         Category="Mission"
@@ -48,6 +53,7 @@ public:
     FName MissionId = TEXT("VOLTA_INTRO");
 
     UPROPERTY(
+        Replicated,
         EditAnywhere,
         BlueprintReadWrite,
         Category="Mission"
