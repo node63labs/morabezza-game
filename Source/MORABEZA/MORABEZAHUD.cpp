@@ -122,14 +122,15 @@ void AMORABEZAHUD::InitializeLocalUI()
 
 void AMORABEZAHUD::ClearDialogueForPawnChange()
 {
-    if (IsValid(ActiveDialogueComponent))
+    // The last contact may still have delegates even after its dialogue
+    // finished and ActiveDialogueComponent was cleared.
+    if (UMORABEZADialogueComponent* Previous = LastDialogueComponent.Get())
     {
-        // A stale contact may outlive the old pawn. It must no longer
-        // publish dialogue events to this player's HUD.
-        ActiveDialogueComponent->OnDialogueLineChanged.RemoveAll(this);
-        ActiveDialogueComponent->OnDialogueFinished.RemoveAll(this);
+        Previous->OnDialogueLineChanged.RemoveAll(this);
+        Previous->OnDialogueFinished.RemoveAll(this);
     }
 
+    LastDialogueComponent.Reset();
     ActiveDialogueComponent = nullptr;
     bDialogueActive = false;
     CurrentSpeaker = FText::GetEmpty();
@@ -329,26 +330,23 @@ void AMORABEZAHUD::SetActiveDialogueComponent(
     UMORABEZADialogueComponent* DialogueComponent
 )
 {
-    /*
-     * IMPORTANT:
-     *
-     * Assigning a component does NOT mean dialogue has started.
-     *
-     * Dialogue becomes active only when the component broadcasts
-     * its first dialogue line through OpenDialogue().
-     */
+    if (UMORABEZADialogueComponent* Previous = LastDialogueComponent.Get())
+    {
+        if (Previous != DialogueComponent)
+        {
+            Previous->OnDialogueLineChanged.RemoveAll(this);
+            Previous->OnDialogueFinished.RemoveAll(this);
+        }
+    }
 
-    ActiveDialogueComponent =
-        DialogueComponent;
-
+    LastDialogueComponent = DialogueComponent;
+    ActiveDialogueComponent = DialogueComponent;
     bDialogueActive = false;
 
     UE_LOG(
         LogTemp,
         Warning,
-        TEXT(
-            "MORABEZA HUD: Active dialogue component assigned: %s"
-        ),
+        TEXT("MORABEZA HUD: Active dialogue component assigned: %s"),
         DialogueComponent
             ? *DialogueComponent->GetName()
             : TEXT("NONE")
