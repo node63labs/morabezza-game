@@ -30,6 +30,10 @@ public:
     virtual FText GetInteractionPrompt_Implementation()
         const override;
 
+    // Cosmetic UI only, called by the accepted interaction's owning client.
+    // This function NEVER grants mission, inventory, or currency changes.
+    void PresentDialogueToLocalPlayer(AActor* Interactor);
+
     UPROPERTY(
         VisibleAnywhere,
         BlueprintReadOnly,
