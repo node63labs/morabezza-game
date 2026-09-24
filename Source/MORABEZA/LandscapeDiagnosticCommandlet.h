@@ -2,9 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Commandlets/Commandlet.h"
-#include "LandscapeProxy.h"
-#include "LandscapeComponent.h"
 #include "LandscapeDiagnosticCommandlet.generated.h"
+
+class UWorld;
+class ALandscapeStreamingProxy;
+class ULandscapeComponent;
 
 UCLASS()
 class MORABEZA_API ULandscapeDiagnosticCommandlet : public UCommandlet
