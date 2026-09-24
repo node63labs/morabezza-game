@@ -1,0 +1,24 @@
+{
+  "schema": "node63.morabezza.int02c.source-overlay.v1",
+  "review_base_commit": "7f92c7a120026c0cb4a3cfaff34c6cbece068e12",
+  "frozen_s0_manifest_sha": "0c94f2584425469d5acbef7c212196037f8b1754",
+  "purpose": "INT-02C cross-target pre-build source review; no Unreal compile acceptance",
+  "overrides": {
+    "Source/MORABEZA/MORABEZACharacter.cpp": {
+      "before": "3636f502a00dc43b80f8d22b13f6aa820d37d863",
+      "after": "5ad9fc1d2809ea2506ec441da094f2611765f785"
+    },
+    "Source/MORABEZA/LandscapeDiagnosticCommandlet.cpp": {
+      "before": "7768e6e3a53dc3fbe0fd4676f51ca62931d68133",
+      "after": "3091a76fded46c39ab0d5177ca3a724bb232f0fd"
+    },
+    "Source/MORABEZA/LandscapeDiagnosticCommandlet.h": {
+      "before": "d363f425306d2dd71c80e281fe48ae3879ae66e6",
+      "after": "4b1e29afeb3087ca7e5a6a28fb62abf17914e8c7"
+    }
+  },
+  "added_paths": {
+    "tests/mmo/test_int02c_prebuild_source.py": "9dc6e479951d48fe744ae796c33fbba7426bdf3f"
+  },
+  "review_status": "SOURCE_ONLY_PENDING_UNREAL"
+}
