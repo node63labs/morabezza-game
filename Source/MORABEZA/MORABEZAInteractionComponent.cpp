@@ -254,6 +254,23 @@ void UMORABEZAInteractionComponent::UpdateInteractionTarget()
         return;
     }
 
+    // Client prompt for the networked test slice must not suggest
+    // authority to interact with another player's private test contact
+    // or an unapproved world actor. Server validation remains mandatory.
+    if (World->GetNetMode() != NM_Standalone)
+    {
+        const AMORABEZAContactActor* Contact =
+            Cast<AMORABEZAContactActor>(HitActor);
+        if (!IsValid(Contact) ||
+            Contact->MissionId != FName(TEXT("TEST_INTERACTION")) ||
+            Contact->GetOwner() != Character->GetController() ||
+            !Contact->GetIsReplicated())
+        {
+            SetInteractionTarget(nullptr);
+            return;
+        }
+    }
+
     /*
      * ============================================================
      * PLAYER DISTANCE CHECK
