@@ -10,32 +10,69 @@
 
 AMORABEZAHUD::AMORABEZAHUD()
 {
-    PrimaryActorTick.bCanEverTick = false;
+    // The owning controller may receive its pawn after HUD BeginPlay.
+    // Rebinding is a cheap pointer comparison; no widgets are rebuilt per tick.
+    PrimaryActorTick.bCanEverTick = true;
 }
 
 void AMORABEZAHUD::BeginPlay()
 {
     Super::BeginPlay();
+    InitializeLocalUI();
+    SynchronizeInteractionBinding();
+}
 
-    APlayerController* PlayerController =
-        GetOwningPlayerController();
+void AMORABEZAHUD::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
 
-    if (!PlayerController)
+    // Also covers a HUD that began play before its owning controller existed.
+    InitializeLocalUI();
+    SynchronizeInteractionBinding();
+}
+
+void AMORABEZAHUD::EndPlay(
+    const EEndPlayReason::Type EndPlayReason
+)
+{
+    if (UMORABEZAInteractionComponent* Previous =
+            BoundInteractionComponent.Get())
     {
-        UE_LOG(
-            LogTemp,
-            Error,
-            TEXT("MORABEZA HUD: No PlayerController found.")
-        );
+        if (bPromptDelegateBound && IsValid(InteractionWidget))
+        {
+            Previous->OnPromptChanged.RemoveDynamic(
+                InteractionWidget,
+                &UMORABEZAInteractionWidget::SetInteractionPrompt
+            );
+        }
+    }
 
+    ClearDialogueForPawnChange();
+    BoundPawn.Reset();
+    BoundInteractionComponent.Reset();
+    bHasInteractionBinding = false;
+    bPromptDelegateBound = false;
+
+    Super::EndPlay(EndPlayReason);
+}
+
+void AMORABEZAHUD::InitializeLocalUI()
+{
+    if (bLocalUIInitialized)
+    {
         return;
     }
 
-    /*
-     * ============================================================
-     * INTERACTION WIDGET
-     * ============================================================
-     */
+    APlayerController* PlayerController = GetOwningPlayerController();
+    if (!IsValid(PlayerController) ||
+        !PlayerController->IsLocalController())
+    {
+        // No owner yet; the next HUD tick will retry.
+        return;
+    }
+
+    // The controller is now available. Create each widget at most once.
+    bLocalUIInitialized = true;
 
     InteractionWidget =
         CreateWidget<UMORABEZAInteractionWidget>(
@@ -43,27 +80,19 @@ void AMORABEZAHUD::BeginPlay()
             UMORABEZAInteractionWidget::StaticClass()
         );
 
-    if (InteractionWidget)
+    if (IsValid(InteractionWidget))
     {
         InteractionWidget->AddToViewport(100);
-
+        InteractionWidget->SetInteractionPrompt(FText::GetEmpty());
+    }
+    else
+    {
         UE_LOG(
             LogTemp,
-            Warning,
-            TEXT("MORABEZA HUD: InteractionWidget created.")
+            Error,
+            TEXT("MORABEZA HUD: Failed to create interaction widget.")
         );
     }
-
-    /*
-     * ============================================================
-     * DIALOGUE WIDGET
-     * ============================================================
-     *
-     * Dialogue is rendered by the HUD.
-     *
-     * The ContactActor only owns/triggers the dialogue component.
-     * The HUD receives the dialogue line and displays it here.
-     */
 
     DialogueWidget =
         CreateWidget<UMORABEZADialogueWidget>(
@@ -71,103 +100,145 @@ void AMORABEZAHUD::BeginPlay()
             UMORABEZADialogueWidget::StaticClass()
         );
 
-    if (DialogueWidget)
+    if (IsValid(DialogueWidget))
     {
         DialogueWidget->AddToViewport(1000);
-
-        DialogueWidget->SetVisibility(
-            ESlateVisibility::Collapsed
-        );
-
+        DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
         DialogueWidget->SetRenderOpacity(1.0f);
-
-        UE_LOG(
-            LogTemp,
-            Warning,
-            TEXT(
-                "MORABEZA HUD: DialogueWidget created at Z=1000."
-            )
-        );
     }
     else
     {
         UE_LOG(
             LogTemp,
             Error,
-            TEXT(
-                "MORABEZA HUD: FAILED to create DialogueWidget."
-            )
+            TEXT("MORABEZA HUD: Failed to create dialogue widget.")
         );
     }
-
-    /*
-     * ============================================================
-     * GAME INPUT MODE
-     * ============================================================
-     */
 
     FInputModeGameOnly InputMode;
-
     PlayerController->SetInputMode(InputMode);
     PlayerController->bShowMouseCursor = false;
+}
 
-    /*
-     * ============================================================
-     * CONNECT INTERACTION COMPONENT
-     * ============================================================
-     */
-
-    AMORABEZACharacter* Character =
-        Cast<AMORABEZACharacter>(
-            PlayerController->GetPawn()
-        );
-
-    if (!Character)
+void AMORABEZAHUD::ClearDialogueForPawnChange()
+{
+    if (IsValid(ActiveDialogueComponent))
     {
-        UE_LOG(
-            LogTemp,
-            Warning,
-            TEXT(
-                "MORABEZA HUD: Player character not available."
-            )
-        );
+        // A stale contact may outlive the old pawn. It must no longer
+        // publish dialogue events to this player's HUD.
+        ActiveDialogueComponent->OnDialogueLineChanged.RemoveAll(this);
+        ActiveDialogueComponent->OnDialogueFinished.RemoveAll(this);
+    }
 
+    ActiveDialogueComponent = nullptr;
+    bDialogueActive = false;
+    CurrentSpeaker = FText::GetEmpty();
+    CurrentDialogue = FText::GetEmpty();
+
+    if (IsValid(DialogueWidget))
+    {
+        DialogueWidget->HideDialogue();
+        DialogueWidget->SetVisibility(ESlateVisibility::Collapsed);
+    }
+}
+
+void AMORABEZAHUD::SynchronizeInteractionBinding()
+{
+    APlayerController* PlayerController = GetOwningPlayerController();
+
+    AMORABEZACharacter* CurrentPawn =
+        IsValid(PlayerController) &&
+        PlayerController->IsLocalController()
+            ? Cast<AMORABEZACharacter>(PlayerController->GetPawn())
+            : nullptr;
+
+    UMORABEZAInteractionComponent* DesiredComponent =
+        IsValid(CurrentPawn) && CurrentPawn->IsLocallyControlled()
+            ? CurrentPawn->FindComponentByClass<
+                  UMORABEZAInteractionComponent
+              >()
+            : nullptr;
+
+    // Stable pawn: bind a widget that became available after the component.
+    // Avoid duplicate delegates on every HUD tick.
+    if (bHasInteractionBinding &&
+        BoundPawn.Get() == CurrentPawn &&
+        BoundInteractionComponent.Get() == DesiredComponent &&
+        IsValid(DesiredComponent))
+    {
+        if (!bPromptDelegateBound && IsValid(InteractionWidget))
+        {
+            DesiredComponent->OnPromptChanged.RemoveDynamic(
+                InteractionWidget,
+                &UMORABEZAInteractionWidget::SetInteractionPrompt
+            );
+            DesiredComponent->OnPromptChanged.AddDynamic(
+                InteractionWidget,
+                &UMORABEZAInteractionWidget::SetInteractionPrompt
+            );
+            bPromptDelegateBound = true;
+            DesiredComponent->UpdateInteractionTarget();
+        }
         return;
     }
 
-    UMORABEZAInteractionComponent* InteractionComponent =
-        Character->FindComponentByClass<
-            UMORABEZAInteractionComponent
-        >();
-
-    if (!InteractionComponent)
+    if (!bHasInteractionBinding && !IsValid(DesiredComponent))
     {
-        UE_LOG(
-            LogTemp,
-            Error,
-            TEXT(
-                "MORABEZA HUD: InteractionComponent not found."
-            )
-        );
-
         return;
     }
 
-    if (InteractionWidget)
+    // A different pawn (or no pawn) invalidates all prior UI bindings.
+    if (UMORABEZAInteractionComponent* Previous =
+            BoundInteractionComponent.Get())
     {
-        InteractionComponent->OnPromptChanged.AddDynamic(
+        if (bPromptDelegateBound && IsValid(InteractionWidget))
+        {
+            Previous->OnPromptChanged.RemoveDynamic(
+                InteractionWidget,
+                &UMORABEZAInteractionWidget::SetInteractionPrompt
+            );
+        }
+    }
+
+    if (bHasInteractionBinding)
+    {
+        ClearDialogueForPawnChange();
+    }
+
+    BoundPawn.Reset();
+    BoundInteractionComponent.Reset();
+    bHasInteractionBinding = false;
+    bPromptDelegateBound = false;
+
+    if (IsValid(InteractionWidget))
+    {
+        InteractionWidget->SetInteractionPrompt(FText::GetEmpty());
+    }
+
+    if (!IsValid(DesiredComponent))
+    {
+        return;
+    }
+
+    BoundPawn = CurrentPawn;
+    BoundInteractionComponent = DesiredComponent;
+    bHasInteractionBinding = true;
+
+    if (IsValid(InteractionWidget))
+    {
+        DesiredComponent->OnPromptChanged.RemoveDynamic(
             InteractionWidget,
             &UMORABEZAInteractionWidget::SetInteractionPrompt
         );
-    }
+        DesiredComponent->OnPromptChanged.AddDynamic(
+            InteractionWidget,
+            &UMORABEZAInteractionWidget::SetInteractionPrompt
+        );
+        bPromptDelegateBound = true;
 
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA HUD: Interaction prompt connected."
-        )
-    );
+        // A prompt may have been detected before the HUD bound its delegate.
+        DesiredComponent->UpdateInteractionTarget();
+    }
 }
 
 void AMORABEZAHUD::OpenDialogue(
