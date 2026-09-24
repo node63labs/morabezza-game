@@ -81,9 +81,62 @@ class ServerInteractionSourceContract(unittest.TestCase):
         self.assertNotIn("Execute_Interact(", presentation)
         self.assertIn("!PlayerController->IsLocalController()", presentation)
 
-    def test_no_extra_workflow_required(self) -> None:
-        # The source contract is intentionally runnable without CI.
-        self.assertTrue((SOURCE / "MORABEZACharacter.h").is_file())
+    def test_network_prompt_restricts_to_owner_scoped_contact(self) -> None:
+        implementation = source("MORABEZAInteractionComponent.cpp")
+        start = implementation.index(
+            "void UMORABEZAInteractionComponent::UpdateInteractionTarget()"
+        )
+        end = implementation.index(
+            "void UMORABEZAInteractionComponent::TryInteract()", start
+        )
+        prompt = implementation[start:end]
+        for guard in (
+            "Character->IsLocallyControlled()",
+            "World->GetNetMode() != NM_Standalone",
+            'Contact->MissionId != FName(TEXT("TEST_INTERACTION"))',
+            "Contact->GetOwner() != Character->GetController()",
+            "Contact->GetIsReplicated()",
+        ):
+            with self.subTest(guard=guard):
+                self.assertIn(guard, prompt)
+
+    def test_first_player_fallback_is_absent_from_contact_and_game_mode(self) -> None:
+        for name in ("MORABEZAContactActor.cpp", "MORABEZAGameMode.cpp"):
+            with self.subTest(file=name):
+                self.assertNotIn("GetFirstPlayerController()", source(name))
+
+    def test_server_effect_is_not_accessible_from_client_input(self) -> None:
+        implementation = source("MORABEZAInteractionComponent.cpp")
+        self.assertEqual(
+            implementation.count("IMORABEZAInteractable::Execute_Interact("),
+            1,
+        )
+        effect = implementation.index(
+            "IMORABEZAInteractable::Execute_Interact("
+        )
+        authoritative_method = implementation.index(
+            "void UMORABEZAInteractionComponent::ExecuteServerInteraction("
+        )
+        self.assertGreater(effect, authoritative_method)
+
+    def test_local_dialogue_presentation_does_not_grant_rewards(self) -> None:
+        implementation = source("MORABEZAContactActor.cpp")
+        start = implementation.index(
+            "void AMORABEZAContactActor::PresentDialogueToLocalPlayer("
+        )
+        presentation = implementation[start:]
+        self.assertIn("!PlayerController->IsLocalController()", presentation)
+        self.assertIn("GetOwner() != PlayerController", presentation)
+        for forbidden in (
+            "Execute_Interact(",
+            "AddMoney(",
+            "SpendMoney(",
+            "AddReputation(",
+            "GrantItem(",
+            "CompleteMission(",
+        ):
+            with self.subTest(forbidden=forbidden):
+                self.assertNotIn(forbidden, presentation)
 
 
 if __name__ == "__main__":
