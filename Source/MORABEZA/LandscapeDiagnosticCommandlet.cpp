@@ -108,7 +108,9 @@ void ULandscapeDiagnosticCommandlet::InspectProxy(
         return;
     }
 
-    const FString ProxyName = Proxy->GetActorLabel();
+    // Actor labels are editor-only; this commandlet is compiled by Game and
+    // Server targets as well. The UObject name is available in all targets.
+    const FString ProxyName = Proxy->GetName();
     const FString PackageName = Proxy->GetPackage()->GetName();
     const FString LandscapeGuid =
         Proxy->GetLandscapeGuid().ToString();
