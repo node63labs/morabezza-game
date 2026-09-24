@@ -4,7 +4,9 @@
 
 #include "Dialogue/MORABEZADialogueComponent.h"
 
+#include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
+#include "Net/UnrealNetwork.h"
 
 #include "MORABEZAHUD.h"
 
@@ -71,6 +73,16 @@ AMORABEZAContactActor::AMORABEZAContactActor()
         );
 }
 
+void AMORABEZAContactActor::GetLifetimeReplicatedProps(
+    TArray<FLifetimeProperty>& OutLifetimeProps
+) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(AMORABEZAContactActor, MissionId);
+    DOREPLIFETIME(AMORABEZAContactActor, ContactName);
+}
+
 void AMORABEZAContactActor::Interact_Implementation(
     AActor* Interactor
 )
@@ -98,33 +110,55 @@ void AMORABEZAContactActor::Interact_Implementation(
         return;
     }
 
-    APlayerController* PlayerController =
-        Cast<APlayerController>(
-            Interactor
-                ? Interactor->GetInstigatorController()
-                : nullptr
-        );
-
-    if (!PlayerController)
+    // Resolve the interacting pawn's controller, not an unrelated player.
+    APlayerController* PlayerController = nullptr;
+    if (APawn* InteractingPawn = Cast<APawn>(Interactor))
     {
         PlayerController =
-            Cast<APlayerController>(
-                GetWorld()
-                    ? GetWorld()->GetFirstPlayerController()
-                    : nullptr
-            );
+            Cast<APlayerController>(InteractingPawn->GetController());
+    }
+    else if (IsValid(Interactor))
+    {
+        PlayerController =
+            Cast<APlayerController>(Interactor->GetInstigatorController());
     }
 
-    if (!PlayerController)
+    if (!IsValid(PlayerController))
     {
         UE_LOG(
             LogTemp,
-            Error,
-            TEXT(
-                "MORABEZA CONTACT: PlayerController unavailable."
-            )
+            Warning,
+            TEXT("MORABEZA CONTACT: No interacting player; dialogue refused.")
         );
+        return;
+    }
 
+    // This development test contact is owned by one connection. A
+    // world-placed, unowned contact retains its existing local dialogue path.
+    if (GetOwner() != nullptr && GetOwner() != PlayerController)
+    {
+        UE_LOG(
+            LogTemp,
+            Warning,
+            TEXT("MORABEZA CONTACT: Wrong owner; dialogue refused.")
+        );
+        return;
+    }
+
+    if (MissionId == FName(TEXT("TEST_INTERACTION")) && GetOwner() == nullptr)
+    {
+        UE_LOG(
+            LogTemp,
+            Warning,
+            TEXT("MORABEZA CONTACT: Missing test owner; dialogue refused.")
+        );
+        return;
+    }
+
+    // Dialogue widgets exist only on the owning client, not a dedicated
+    // server. This local UI path grants no authoritative gameplay result.
+    if (!PlayerController->IsLocalController())
+    {
         return;
     }
 
