@@ -18,6 +18,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "Docs" / "S0_INTEGRATION_SOURCE_MANIFEST.json"
+REVIEW_OVERLAY = ROOT / "Docs" / "INT_02C_SOURCE_OVERRIDES.json"
 
 
 def git_blob_sha1(data: bytes) -> str:
@@ -46,6 +47,43 @@ def verify_manifest() -> None:
         or len(entries) != 21
     ):
         raise ValueError("unexpected source manifest path count or collision")
+
+    # INT-02C is a distinct reviewed source revision, not a rewrite of
+    # INT-01's frozen PR4–PR7 manifest. Strictly layer the three documented
+    # pre-build changes onto that immutable source identity.
+    if REVIEW_OVERLAY.is_file():
+        overlay = json.loads(REVIEW_OVERLAY.read_text(encoding="utf-8"))
+        if overlay.get("schema") != "node63.morabezza.int02c.source-overlay.v1":
+            raise ValueError("unknown INT-02C source overlay schema")
+        if overlay.get("review_base_commit") != "7f92c7a120026c0cb4a3cfaff34c6cbece068e12":
+            raise ValueError("INT-02C overlay does not identify the reviewed PR9 base")
+        if overlay.get("frozen_s0_manifest_sha") != git_blob_sha1(MANIFEST.read_bytes()):
+            raise ValueError("INT-02C overlay's immutable S0 manifest hash changed")
+        before = {
+            "Source/MORABEZA/MORABEZACharacter.cpp":
+                "3636f502a00dc43b80f8d22b13f6aa820d37d863",
+            "Source/MORABEZA/LandscapeDiagnosticCommandlet.cpp":
+                "7768e6e3a53dc3fbe0fd4676f51ca62931d68133",
+            "Source/MORABEZA/LandscapeDiagnosticCommandlet.h":
+                "d363f425306d2dd71c80e281fe48ae3879ae66e6",
+        }
+        changes = overlay.get("overrides", {})
+        added = overlay.get("added_paths", {})
+        if set(changes) != set(before) or set(added) != {
+            "tests/mmo/test_int02c_prebuild_source.py"
+        }:
+            raise ValueError("INT-02C overlay contains unexpected changed paths")
+        for path, original_sha in before.items():
+            change = changes[path]
+            if change.get("before") != original_sha:
+                raise ValueError(f"INT-02C pre-review source SHA mismatch: {path}")
+            if path in entries and entries[path] != original_sha:
+                raise ValueError(f"INT-02C override disagrees with frozen S0 manifest: {path}")
+            entries[path] = change["after"]
+        entries.update(added)
+        if len(entries) != 24:
+            raise ValueError("INT-02C overlay has wrong combined path count")
+        print("INT-02C REVIEW OVERLAY ACTIVE: 3 reviewed changes and 1 new regression test")
 
     errors: list[str] = []
     for raw_path, expected in sorted(entries.items()):
