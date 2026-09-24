@@ -58,6 +58,7 @@ private:
 
     TWeakObjectPtr<AMORABEZACharacter> BoundPawn;
     TWeakObjectPtr<UMORABEZAInteractionComponent> BoundInteractionComponent;
+    TWeakObjectPtr<UMORABEZADialogueComponent> LastDialogueComponent;
 
     bool bLocalUIInitialized = false;
     bool bHasInteractionBinding = false;
