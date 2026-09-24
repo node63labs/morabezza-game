@@ -30,6 +30,10 @@ public:
     UFUNCTION(BlueprintCallable, Category="Interaction")
     void UpdateInteractionTarget();
 
+    // Server-only entry from the owning AMORABEZACharacter RPC.
+    // RequestedTarget is untrusted and is never executed without revalidation.
+    void ExecuteServerInteraction(AActor* RequestedTarget);
+
     UPROPERTY(
         EditAnywhere,
         BlueprintReadWrite,
@@ -63,6 +67,9 @@ protected:
 private:
 
     TWeakObjectPtr<AActor> CurrentTarget;
+
+    // Server-side request spacing only. This is NOT a durable replay ledger.
+    double LastServerInteractionSeconds = -1000.0;
 
     void SetInteractionTarget(AActor* NewTarget);
 };
