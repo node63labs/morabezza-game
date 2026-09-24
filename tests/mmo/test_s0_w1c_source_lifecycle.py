@@ -142,6 +142,27 @@ class PossessionSafeInputAndHUD(unittest.TestCase):
         self.assertIn("bDialogueActive = false", cleanup)
         self.assertIn("DialogueWidget->HideDialogue();", cleanup)
 
+    def test_finished_dialogue_still_unbinds_on_next_pawn(self) -> None:
+        header = read("MORABEZAHUD.h")
+        implementation = read("MORABEZAHUD.cpp")
+        self.assertIn(
+            "TWeakObjectPtr<UMORABEZADialogueComponent> LastDialogueComponent",
+            header,
+        )
+        setter = method(
+            implementation,
+            "void AMORABEZAHUD::SetActiveDialogueComponent(",
+            "void AMORABEZAHUD::AdvanceDialogue()",
+        )
+        self.assertIn("LastDialogueComponent = DialogueComponent", setter)
+        cleanup = method(
+            implementation,
+            "void AMORABEZAHUD::ClearDialogueForPawnChange()",
+            "void AMORABEZAHUD::SynchronizeInteractionBinding()",
+        )
+        self.assertIn("LastDialogueComponent.Get()", cleanup)
+        self.assertIn("LastDialogueComponent.Reset()", cleanup)
+
     def test_hud_endplay_detaches_prompt_and_dialogue(self) -> None:
         implementation = read("MORABEZAHUD.cpp")
         endplay = method(
