@@ -8,6 +8,8 @@
 class UMORABEZAInteractionWidget;
 class UMORABEZADialogueWidget;
 class UMORABEZADialogueComponent;
+class UMORABEZAInteractionComponent;
+class AMORABEZACharacter;
 
 UCLASS()
 class MORABEZA_API AMORABEZAHUD : public AHUD
@@ -43,8 +45,24 @@ public:
 protected:
 
     virtual void BeginPlay() override;
+    virtual void Tick(float DeltaTime) override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
+
+    // BeginPlay may precede a valid owning controller or possessed pawn.
+    // Retry UI creation and reconcile only when the owned pawn changes.
+    void InitializeLocalUI();
+    void SynchronizeInteractionBinding();
+    void ClearDialogueForPawnChange();
+
+    TWeakObjectPtr<AMORABEZACharacter> BoundPawn;
+    TWeakObjectPtr<UMORABEZAInteractionComponent> BoundInteractionComponent;
+    TWeakObjectPtr<UMORABEZADialogueComponent> LastDialogueComponent;
+
+    bool bLocalUIInitialized = false;
+    bool bHasInteractionBinding = false;
+    bool bPromptDelegateBound = false;
 
     UPROPERTY()
     TObjectPtr<UMORABEZAInteractionWidget> InteractionWidget;

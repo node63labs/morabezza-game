@@ -14,6 +14,7 @@ class UAnimationAsset;
 class UInputComponent;
 class UInputAction;
 class UInputMappingContext;
+class UEnhancedInputLocalPlayerSubsystem;
 
 struct FInputActionValue;
 
@@ -45,6 +46,15 @@ protected:
 
     virtual void BeginPlay() override;
 
+    // Runs on the owning client when the pawn is restarted/possessed.
+    // BeginPlay alone is not a reliable point for local input mapping.
+    virtual void PawnClientRestart() override;
+
+    // Also reconcile a replicated controller change (including unpossession).
+    virtual void OnRep_Controller() override;
+
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
     virtual void SetupPlayerInputComponent(
         UInputComponent* PlayerInputComponent
     ) override;
@@ -56,6 +66,12 @@ private:
      * ENHANCED INPUT
      * ============================================================
      */
+
+    // Idempotent and local-only. Never wipes other systems' mapping contexts.
+    void RefreshLocalInputMapping();
+    void UnregisterLocalInputMapping();
+
+    TWeakObjectPtr<UEnhancedInputLocalPlayerSubsystem> RegisteredInputSubsystem;
 
     void MoveForward(
         const FInputActionValue& Value
