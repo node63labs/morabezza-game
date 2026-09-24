@@ -1,0 +1,56 @@
+{
+  "schema": "node63.morabezza.s0.integration-source-manifest.v1",
+  "generated_date": "2026-09-24",
+  "repository": "node63labs/morabezza-game",
+  "branch": "integration/s0-w0-w1c-candidate-20260924",
+  "authority_main_sha": "af8f3d0e5f9291b1358232c7055190e4bd57b9f6",
+  "integration_base_sha": "42d6307299c4123bd56689b333d99db4dc6a2f21",
+  "source_snapshot_heads": {
+    "PR-4_S0-W0": "115ddba8c43377656e1a7e70c2374607e4347355",
+    "PR-5_S0-W1a": "6962de04e7403af8fa8dbb2624fad504e64b7276",
+    "PR-6_S0-W1b": "e7f9ed86b61a8a8f4ee22de2903ef1d68a7f18c2",
+    "PR-7_S0-W1c": "42d6307299c4123bd56689b333d99db4dc6a2f21"
+  },
+  "source_import_method": "PR7 commit ancestry preserved; five PR4 text files materialized byte-for-byte from frozen PR4 snapshot; this is content-level integration, not a git merge or cherry-pick of PR4 history",
+  "paths": {
+    "from_pr4": {
+      ".github/workflows/s0-w0-preflight.yml": "d7ac39ab437f22e9dd195885901f2f430112daeb",
+      "Docs/S0_W0_DEDICATED_SERVER_HARNESS.md": "b77ca0c3d0dd766e9a00193036b75817f4ea3e5a",
+      "Source/MORABEZAServer.Target.cs": "bee92935534e36592906c0c7eee7755aab128140",
+      "scripts/mmo/s0_two_client_smoke.sh": "6f0360cd34fc368e57eb0df3560f612945bdbea9",
+      "tests/mmo/test_s0_w0_preflight.py": "eca76950a4adecac16d4eacea4f18573077baa92"
+    },
+    "from_pr7_stack": {
+      "Docs/S0_W1A_PER_PLAYER_CONTACT_ISOLATION.md": "7a3f29bc097238d0a845da60c2310254d85d8f9e",
+      "Docs/S0_W1B_OFFLINE_CODE_REVIEW_2026_09_24.md": "03603513d3bfcc235e157720be26ca507f17461e",
+      "Docs/S0_W1B_SERVER_INTERACTION_VALIDATION.md": "16888a2b9a38a90abc95db2bb05086b24ed66f1c",
+      "Docs/S0_W1C_POSSESSION_SAFE_INPUT_AND_HUD.md": "d23cb1cd8d864026dd46daf119dfa32b1ececb86",
+      "Source/MORABEZA/MORABEZACharacter.cpp": "3636f502a00dc43b80f8d22b13f6aa820d37d863",
+      "Source/MORABEZA/MORABEZACharacter.h": "20d684bc2fcfe9fe99be1081f80b2011447de574",
+      "Source/MORABEZA/MORABEZAContactActor.cpp": "f40ce19ee34bd4caa289d792f2c19851f8bc08d3",
+      "Source/MORABEZA/MORABEZAContactActor.h": "93c0c18916afdaa2c5ef7013b9ff4a50be1f1b5b",
+      "Source/MORABEZA/MORABEZAGameMode.cpp": "093987f50da162fb246aeb42c0e30356667baa81",
+      "Source/MORABEZA/MORABEZAGameMode.h": "7353f30c2e81a17f125626b1f561ac93fa452fd0",
+      "Source/MORABEZA/MORABEZAHUD.cpp": "9d94550b208c4d10b69c27ec28c6b49198716d66",
+      "Source/MORABEZA/MORABEZAHUD.h": "754e8fa4ed7ac802521a8e2707d5f13f8e42c086",
+      "Source/MORABEZA/MORABEZAInteractionComponent.cpp": "04e9fa75c01b8e459dfb90619b1ba8726bb16b7d",
+      "Source/MORABEZA/MORABEZAInteractionComponent.h": "4faea937cffaa906a3e6ebd644c3ad9b45c2546e",
+      "tests/mmo/test_s0_w1b_source_contract.py": "d7e92f3b0e201ea8899b01239d686dabc268c2a6",
+      "tests/mmo/test_s0_w1c_source_lifecycle.py": "ec8e97f4a7fa509499a95f1c85165758fc64d4c9"
+    }
+  },
+  "verification_contract": {
+    "hash_kind": "Git SHA-1 blob ID of raw UTF-8 source bytes",
+    "content_union_verified_on_creation": true,
+    "source_test_scripts": [
+      "tests/mmo/test_s0_w0_preflight.py",
+      "tests/mmo/test_s0_w1b_source_contract.py",
+      "tests/mmo/test_s0_w1c_source_lifecycle.py"
+    ],
+    "source_test_execution": "PENDING, no GitHub Actions requested",
+    "unreal_5_8_compile": "NOT EXECUTED",
+    "dedicated_server_and_two_client_tests": "NOT EXECUTED",
+    "canon_world_authority": "BLOCKED by RM-01",
+    "main_merge_authorization": "NOT GRANTED"
+  }
+}
