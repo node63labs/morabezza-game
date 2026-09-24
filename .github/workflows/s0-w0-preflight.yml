@@ -1,0 +1,49 @@
+name: S0-W0 source-only server harness preflight
+
+on:
+  push:
+    branches:
+      - feat/s0-w0-server-harness
+    paths:
+      - Source/MORABEZAServer.Target.cs
+      - scripts/mmo/**
+      - tests/mmo/**
+      - .github/workflows/s0-w0-preflight.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - Source/MORABEZAServer.Target.cs
+      - scripts/mmo/**
+      - tests/mmo/**
+      - .github/workflows/s0-w0-preflight.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-only-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout text sources only
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 1
+          lfs: false
+          persist-credentials: false
+
+      - name: Validate launch harness syntax
+        run: bash -n scripts/mmo/s0_two_client_smoke.sh
+
+      - name: Run source-only preflight tests
+        run: python3 -m unittest discover -s tests/mmo -p 'test_*.py' -v
+
+      - name: Record verification scope
+        run: |
+          echo 'S0-W0 SOURCE PREFLIGHT ONLY: syntax, input safety and target shape.'
+          echo 'UNREAL COMPILE: NOT EXECUTED'
+          echo 'DEDICATED SERVER LAUNCH: NOT EXECUTED'
+          echo 'TWO-CLIENT CONNECTION/REPLICATION: NOT VERIFIED'
+          echo 'PRODUCTION MAPS: UNCHANGED'
