@@ -51,10 +51,10 @@ test_map="${MORABEZA_TEST_MAP:-}"
 port="${MORABEZA_TEST_PORT:-7777}"
 wait_seconds="${MORABEZA_SMOKE_WAIT:-8}"
 
-[[ -n "$server_bin" && -f "$server_bin" && -x "$server_bin" ]] ||
-  fail "MORABEZA_SERVER_BIN must name an existing executable"
-[[ -n "$client_bin" && -f "$client_bin" && -x "$client_bin" ]] ||
-  fail "MORABEZA_CLIENT_BIN must name an existing executable"
+[[ "$server_bin" == /* && -f "$server_bin" && -x "$server_bin" ]] ||
+  fail "MORABEZA_SERVER_BIN must name an existing executable at an absolute path"
+[[ "$client_bin" == /* && -f "$client_bin" && -x "$client_bin" ]] ||
+  fail "MORABEZA_CLIENT_BIN must name an existing executable at an absolute path"
 
 # A narrow test-zone path avoids silently booting unresolved production maps.
 [[ "$test_map" =~ ^/Game/Dev/[A-Za-z0-9_]+$ ]] ||
