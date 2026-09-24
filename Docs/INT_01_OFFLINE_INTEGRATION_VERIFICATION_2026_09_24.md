@@ -1,76 +1,82 @@
-# INT-01 — Controlled Integration Verification Evidence
+# INT-01 — Offline Integration Verification Evidence
 
 **Date:** 2026-09-24  
 **Repository:** `node63labs/morabezza-game`  
 **Integration branch:** `integration/s0-w0-w1c-candidate-20260924`  
-**Frozen candidate commit verified:** `35f4c8a66c0919f1c25b4d8c6f00876b8820b9c4`  
-**Frozen PR #7 base:** `42d6307299c4123bd56689b333d99db4dc6a2f21`  
-**Frozen PR #4 import:** `115ddba8c43377656e1a7e70c2374607e4347355`  
-**Authority main at preflight:** `af8f3d0e5f9291b1358232c7055190e4bd57b9f6`  
-**Status:** **PARTIAL PASS — INT-01 ACCEPTANCE NOT YET MET**  
-**Actions policy:** No GitHub Actions workflow was manually or automatically run for this verification.
+**Branch head when archive was obtained:** `2aa532fef43140f50af615c6b42266508cac3a79`  
+**Frozen PR #7 integration base:** `42d6307299c4123bd56689b333d99db4dc6a2f21`  
+**Frozen PR #4 file import:** `115ddba8c43377656e1a7e70c2374607e4347355`  
+**Authority `main` at execution check:** `af8f3d0e5f9291b1358232c7055190e4bd57b9f6`  
+**Status:** **INT-01 PASS — OFFLINE SOURCE INTEGRATION ACCEPTED ONLY**  
+**GitHub Actions:** Not used for this gate.  
+**Unreal/runtime:** Not executed and not accepted.
 
-## 1. What was actually executed
+## 1. Verified archive provenance and execution context
 
-### INT-01a — Remote exact-source identity: PASS
+The user supplied the ZIP for the integration branch as a conversation attachment. The exact uploaded ZIP was inspected before extraction: 699 ZIP entries, 371,244 declared uncompressed bytes, one expected top-level project folder, no unsafe traversal paths, and no ZIP symlinks. The archive's SHA-256 was:
 
-The verifier read `Docs/S0_INTEGRATION_SOURCE_MANIFEST.json` from the candidate branch, then independently fetched **each of its 21 listed files** from the same branch through the live GitHub repository connector. All 21 returned Git blob SHA IDs matched their frozen manifest values:
-
-- Five S0-W0 files imported byte-for-byte from PR #4.
-- Sixteen files from the PR #5 → #6 → #7 source stack.
-- Zero manifest-vs-GitHub blob mismatches in three bounded read batches (8 + 8 + 5).
-- No source-file content was modified during verification.
-
-Git blob IDs are returned by GitHub for those files; this is a remote, independent **source identity** check. It is **not** a successful local run of `scripts/mmo/verify_s0_integration.py`.
-
-### INT-01b — Remote source-contract assertions: PASS (limited scope)
-
-Eight candidate files were fetched from GitHub and evaluated by an isolated JavaScript source checker. **18/18 bounded source-contract assertions PASS** for server-target declaration, harness plan/guard structure, candidate-to-server RPC routing, owner/range/LOS guard presence, idempotent input mapping, HUD possession reconciliation and delegate teardown. The three committed Python suites contain **23 test methods** in total (S0-W0: 6, S0-W1b: 8, S0-W1c: 9).
-
-These are **string/source structure checks**, not execution of the committed Python tests, a Bash parser, Unreal Header Tool, C++ compilation, real RPC traffic or actual two-player behavior. A source guard may be present yet still be incorrect at runtime.
-
-## 2. Why INT-01 is not accepted
-
-The current execution sandbox has Python and Git but **cannot resolve `github.com`** for a fresh checkout. Its attempted `git ls-remote https://github.com/node63labs/morabezza-game.git HEAD` returned: `Could not resolve host: github.com` (exit 128). GitHub-connector read calls succeed, but the connector does not materialize a full working tree in the sandbox. No exact local integration checkout was available for the committed verifier or the three Python suites. A GitHub-hosted Actions run was intentionally **not** substituted for offline testing.
-
-Accordingly the following required checks remain **NOT EXECUTED**:
-
-```bash
-python3 scripts/mmo/verify_s0_integration.py
-python3 scripts/mmo/verify_s0_integration.py --run-tests
+```text
+c97f227414c0d51b08b8730edb4d55adbc7cc72c5defa66959d4340e1463a442
 ```
 
-The second command would perform the Bash syntax test plus Python standard-library `unittest` discovery in the same exact integration checkout. A 21/21 remote GitHub blob readback does **not** claim either command passed locally.
+A GitHub source archive contains no `.git` commit metadata; archive name alone does not prove its Git commit. The accepted source identity comes from the **21 frozen Git blob hashes** in `Docs/S0_INTEGRATION_SOURCE_MANIFEST.json`, checked against the actual extracted file bytes. The earlier remote GitHub readback separately confirmed 21/21 blob identities against the integration branch.
 
-## 3. Formal gate matrix
+Execution environment: isolated Linux sandbox, system Python **3.13.5** (`/usr/bin/python3`), Bash **5.2.37**, no GitHub Actions, no engine installation or game runtime. The final clean execution used system Python to avoid an unrelated virtual-environment startup warning encountered during a preceding successful run.
 
-| Gate item | Result | Evidence / limitation |
-| --- | --- | --- |
-| Frozen manifest vs live candidate source file identities | **PASS — 21/21** | Independently retrieved GitHub blob IDs match the frozen 21-path manifest. |
-| Source-level integration guard presence | **PASS — 18/18** | JavaScript source checker; no Python test invocation. |
-| Local verifier SHA-1 checks against a checked-out tree | **PENDING** | Sandbox lacks the repository checkout. |
-| Bash `-n` syntax check of integrated launch script | **PENDING** | Not executed against the checked-out candidate in INT-01. |
-| S0-W0 Python suite (6 methods) | **PENDING** | Not executed. |
-| S0-W1b Python suite (8 methods) | **PENDING** | Not executed. |
-| S0-W1c Python suite (9 methods) | **PENDING** | Not executed. |
-| Unreal Engine 5.8 UHT / C++ compilation | **OUT OF SCOPE / PENDING INT-02** | Requires compatible Unreal host. |
-| Dedicated server and two-client gameplay | **OUT OF SCOPE / PENDING INT-03/04** | No Unreal runtime evidence. |
-| `main` merge | **NOT AUTHORIZED** | Candidate remains isolated and draft. |
+## 2. Command and actual results
 
-**INT-01 disposition:** identity and remote source checks are verified, but INT-01 remains **PARTIAL / NOT ACCEPTED** until the local verifier and all three offline Python suites complete against an exact checkout.
-
-## 4. Completion path without GitHub Actions
-
-Provide the exact GitHub integration branch source tree to an offline Python/Bash runner (for example an uploaded ZIP made from candidate commit `35f4c8a66c0919f1c25b4d8c6f00876b8820b9c4`, or an independently reachable clone). The archive must include the manifest, all 21 listed files, verifier, existing game build target and offline test suites. Do not infer a clean original working tree from an archive if there are untracked local changes.
-
-On that exact candidate, execute:
+Executed from the extracted archive's project root:
 
 ```bash
-python3 scripts/mmo/verify_s0_integration.py --run-tests
+/usr/bin/python3 scripts/mmo/verify_s0_integration.py --run-tests
 ```
 
-Record interpreter version, OS/Bash version, exact candidate commit, 21 blob results, Bash syntax result, Python test count, failures and exit code. If any file is intentionally changed, create a new reviewed candidate snapshot and update the manifest rather than weakening hash validation. No full Unreal LFS payload download is required for these source-only tests.
+The committed verifier ran its local Git blob-hash check and then invoked:
 
-If the source archive is uploaded into the conversation, the assistant can use the sandbox to run the Python and Bash checks and attach their actual output to this record. An Unreal-compatible host is a separate requirement for INT-02 and beyond.
+```bash
+bash -n scripts/mmo/s0_two_client_smoke.sh
+/usr/bin/python3 -m unittest discover -s tests/mmo -p 'test_*.py' -v
+```
 
-**No `main` promotion, PR merge, runtime claim or gameplay acceptance is implied by this evidence.**
+| INT-01 check | Observed result |
+| --- | --- |
+| Exact source manifest checks against extracted file bytes | **PASS, 21/21 frozen Git blob IDs** |
+| Bash syntax validation of the two-client launch harness | **PASS, exit 0** |
+| S0-W0 source-only preflight | **PASS, 6 tests** |
+| S0-W1b source-contract checks | **PASS, 8 tests** |
+| S0-W1c possession/HUD source-contract checks | **PASS, 9 tests** |
+| Combined Python unittest discovery | **PASS, 23 tests, 0 failures/errors** |
+| Committed verifier process | **PASS, exit 0** |
+| Unreal Header Tool/C++ compilation | **NOT EXECUTED — INT-02** |
+| Dedicated server, client connection, replication, gameplay | **NOT EXECUTED — INT-03/04** |
+| Merge into `main` | **NOT AUTHORIZED / NOT PERFORMED** |
+
+Recorded terminal summary:
+
+```text
+S0 SOURCE SNAPSHOT PASS: 21 exact Git blob IDs
+S0 STATUS: candidate only; Unreal compile and runtime NOT VERIFIED
+S0 OFFLINE TEST: bash -n scripts/mmo/s0_two_client_smoke.sh
+S0 OFFLINE TEST: /usr/bin/python3 -m unittest discover -s tests/mmo -p test_*.py -v
+S0 OFFLINE TEST PASS: syntax and Python source-contract suites only
+UNREAL COMPILE: NOT EXECUTED; TWO-CLIENT NETWORK TEST: NOT EXECUTED
+
+----------------------------------------------------------------------
+Ran 23 tests in 0.209s
+
+OK
+```
+
+No actual game server or client was launched. S0-W0 tests only exercise the script's nonexecuting `--plan` mode using a harmless executable path placeholder. Source-contract tests inspect C++ text; they are **not** C++ execution, network authorization proof or UE5.8 build evidence.
+
+## 3. Prior remote verification and resolved blocker
+
+Earlier in this gate, the connected GitHub source review passed **21/21 remote blob identities** and **18/18 source-string checks**, but the Python/Bash suite remained pending because the sandbox could not clone GitHub by DNS. The user's uploaded ZIP resolved that exact-checkout blocker: all 21 frozen file hashes passed in the extracted tree and the full offline Bash/Python suite executed successfully. The previous **PARTIAL PASS** classification is superseded by this record.
+
+## 4. Acceptance boundary and next gate
+
+**INT-01 is ACCEPTED for the defined offline source-integration scope only.** The integration branch and draft PR #8 remain isolated. PRs #4–#7 still require reviewed integration sequencing, and no new production, canonical-world, security or multiplayer-runtime claim follows from these tests.
+
+**INT-02** requires a compatible Unreal Engine 5.8 development environment, the actual required plugins/compiler, generated-header validation, game/client and dedicated-server compilation, and captured build logs at a pinned candidate source revision. The `/Game/Dev/<Name>` disposable test-zone requirement and RM-01 canonical-world/SSD authority remain separate. INT-03/04 require an actual server and two-client playtest, ownership/range/LOS negative cases and possession/respawn evidence.
+
+`main` was unchanged at verification time; its branch-protection review remains open. Do not mark the integrated runtime complete or merge this candidate into `main` because INT-01 passed.
