@@ -4,19 +4,19 @@
 **Repository:** node63labs/morabezza-game  
 **Audit date:** 2026-09-24  
 **Audit class:** Read-only repository and recovery preflight  
-**Status:** SOURCE INVENTORY COMPLETE — CLEAN RECOVERY NOT YET VERIFIED  
+**Status:** SOURCE INVENTORY COMPLETE — REMOTE GIT LFS RECOVERY PASS — FULL UNREAL RECOVERY PENDING  
 **Audited branch:** main  
 **Audited commit:** af8f3d0e5f9291b1358232c7055190e4bd57b9f6  
 **Audited tree:** 934b017735844baf6108f7971658438c95c57c26  
 
-This document records what the remote repository demonstrably contains. It does not assert that the local SSD is synchronized, that Git LFS objects can be fetched, that Unreal builds, or that either candidate map is the authoritative production world.
+This document records what the remote repository demonstrably contains. A fresh GitHub-hosted runner has recovered and integrity-verified the tracked Unreal LFS payloads. It does not assert that the local SSD is synchronized, that Unreal builds, or that either candidate map is the authoritative production world.
 
 ## 1. Evidence scope and method
 
 - Read-only inspection of GitHub repository metadata, main branch and the recursive Git tree at the audited commit.
 - Inspection of the project descriptor, README, game-design document, Git attributes, Git ignore rules, engine configuration and selected C++ source.
 - Inspection of Git LFS pointer text for both maps and the interaction-prompt asset.
-- No Unreal Editor execution, clean clone, Git LFS binary download, compilation, project generation, gameplay execution, local SSD inspection or production mutation.
+- GitHub Actions executed a fresh hosted-runner checkout and downloaded/verified Git LFS payloads. No Unreal Editor execution, C++ compilation, project generation, gameplay execution, local SSD inspection or production mutation occurred.
 - No repository configuration, visibility, branch protection, map, asset or source-code change is authorized by this audit.
 
 ## 2. Repository authority and governance
@@ -51,7 +51,7 @@ The Git tree response was not truncated.
 | Config/ tracked files | 3 |
 | Docs/ tracked files | 1 |
 
-The 293 Unreal binary-file paths have Git blob sizes of 129–131 bytes, consistent with Git LFS pointers, not actual playable Unreal asset payloads. Both map pointers and one UI asset pointer were inspected directly. **Remote LFS payload availability and integrity have NOT been proven.**
+The 293 Unreal binary-file paths have Git blob sizes of 129–131 bytes, consistent with Git LFS pointers, not actual playable Unreal asset payloads. Both map pointers and one UI asset pointer were inspected directly. **A clean GitHub-hosted runner subsequently downloaded and independently verified all 293 tracked Unreal binary payloads; this does not validate their Unreal-level semantic integrity.**
 
 Representative LFS evidence:
 
@@ -73,6 +73,24 @@ The Git attributes file declares Git LFS filters for Unreal maps/assets and seve
 - Config/DefaultEngine.ini currently selects /Game/dskjnfkljsdnf for game and Editor startup.
 
 The selected startup map is **not** proof of canonical world authority. Equal actor-file counts do not prove package equivalence, Landscape GUID consistency, complete cell coverage, or correct World Partition ownership. Do not rename, delete, regenerate or consolidate either map's binary packages based on this inventory.
+
+### 3.3 GitHub-hosted clean Git LFS recovery — PASS
+
+The audit branch contains a **read-only** GitHub Actions workflow, `.github/workflows/rm-01-lfs-recovery.yml`, which executes in a clean GitHub-hosted Ubuntu runner. Its first completed run provides the following actual evidence:
+
+| Evidence | Result |
+| --- | --- |
+| Workflow run | https://github.com/node63labs/morabezza-game/actions/runs/35972759630 |
+| Run conclusion | SUCCESS |
+| Recovered checkout SHA | 426e9e9f2b053195a408676aafaf59132f5fbb85 |
+| Git LFS version | 3.8.0 |
+| Git LFS fsck | OK |
+| Unreal binary payloads individually verified | 293 / 293 |
+| Integrity check | Git HEAD LFS pointer SHA-256 and declared size compared against every recovered working-tree payload |
+| Aggregate recovered Unreal asset bytes | 65,689,940 |
+| Working tree following recovery | CLEAN |
+
+This run establishes a clean **hosted-runner Git LFS recovery** for the audited source tree plus the RM-01 documentation and workflow commits. It does not prove that the two map files open in Unreal, that the landscape/external-actor packages are mutually consistent, or that the SSD contains no newer work. The local workstation could not reach GitHub during this session and has no git-lfs installation; the independent GitHub-hosted runner is the execution environment for this evidence.
 
 ### 3.2 Source foundation
 
@@ -100,8 +118,8 @@ Before clean recovery, verify availability and compatible installation of the ex
 | --- | --- | --- |
 | RM01-01 | GitHub main commit and complete file-tree inventory | PASS — SOURCE |
 | RM01-02 | Git LFS tracking rules and representative pointers | PASS — SOURCE |
-| RM01-03 | All remote LFS payloads downloadable | NOT VERIFIED |
-| RM01-04 | Fresh-clone LFS object integrity | NOT EXECUTED |
+| RM01-03 | All tracked Unreal LFS payloads downloadable | PASS — GitHub-hosted recovery, run 35972759630 |
+| RM01-04 | Fresh hosted-runner LFS object integrity | PASS — git lfs fsck plus individual SHA-256/size verification |
 | RM01-05 | Local SSD branch, commits, uncommitted files and additional assets reconciled | NOT EXECUTED |
 | RM01-06 | Unreal 5.8 and required plugins available on recovery host | NOT EXECUTED |
 | RM01-07 | Clean project generation and C++ compile | NOT EXECUTED |
@@ -111,7 +129,7 @@ Before clean recovery, verify availability and compatible installation of the ex
 | RM01-11 | CI/build pipeline and repository protection policy review | OPEN |
 | RM01-12 | Tracked configuration and public-distribution security review | OPEN — OWNER REVIEW |
 
-**Recovery gate: NOT ACCEPTED. M0 world authority remains unresolved.**
+**Remote LFS recovery subgate: PASS. Full recovery gate: NOT ACCEPTED. M0 world authority remains unresolved.**
 
 ## 6. Next machine: safe recovery sequence
 
@@ -158,4 +176,4 @@ Record the actual command outputs and failures. On a recovery checkout of audite
 
 RM-01 may close only when **both** the remote recovery and the SSD reconciliation are documented, or an explicit reviewed decision records that local-only data is irrecoverable and defines the accepted loss. Required final evidence: exact authoritative SHA, complete LFS fetch/integrity results, local/remote delta register, clean Unreal build and Editor launch, candidate-map diagnostics, and a bounded recovery procedure.
 
-**Current disposition:** source inventory available for remote architecture and code review; full Unreal recovery and canonical-world acceptance remain pending a suitable machine and SSD access.
+**Current disposition:** remote Git LFS payload recovery is independently verified; remote architecture and source review can proceed. Full Unreal build/recovery, SSD reconciliation and canonical-world acceptance remain pending a suitable machine and SSD access.
