@@ -13,7 +13,7 @@ The approved Portfolio Charter v1.0 defines **Morabeza as a hospitality-oriented
 
 The project-provided NODE63 Master Roadmap v1.4 and Ecosystem/Product Boundaries v1.1 are explicitly **draft revisions requiring founder approval**. The roadmap discusses Morabeza P5, not a separately registered MORABEZZA game. Do not silently treat those drafts as an approved portfolio amendment or silently transfer hospitality product authority to game character data.
 
-**PC-01 — founder decision recorded 2026-09-25:** MORABEZZA is a separate NODE63 game product, **not** a subproject of the Morabeza hospitality product. The [founder decision record](https://github.com/node63labs/node63-governance/blob/governance/pc-01-morabezza-independent-game-20260925/portfolio/decisions/PC_01_MORABEZZA_INDEPENDENT_GAME_2026_09_25.md) is on a separate governance branch. The existing approved charter remains unchanged pending controlled incorporation; no game roadmap priority, staffing or implementation authority has been assigned.
+**PC-01 — founder decision recorded 2026-09-25:** MORABEZZA is a separate NODE63 game product, **not** a subproject of the Morabeza hospitality product. The [founder decision record](https://github.com/node63labs/node63-governance/blob/governance/pc-01-morabezza-independent-game-20260925/portfolio/decisions/PC_01_MORABEZZA_INDEPENDENT_GAME_2026_09_25.md) is on a separate governance branch. The existing approved charter remains unchanged. [Draft governance PR #15](https://github.com/node63labs/node63-governance/pull/15) stages a controlled v1.1 PC-01 amendment; its initial CI result is failure and governance approval/merge remain pending. No game roadmap priority, staffing or implementation authority has been assigned.
 
 ## 2. What the RM-02 candidate proposes, without accepting implementation
 
@@ -60,6 +60,10 @@ The candidate implementation order predates W1a/W1b/W1c. The later draft branche
 The first complete MMORPG slice in PR #3 additionally proposes one resource, one NPC, one enemy and one durable reward. The current draft source only establishes a test-contact dialogue candidate, not that vertical slice. Preserve both descriptions with their evidence scope.
 
 A versioned product-definition delta must reconcile the proposed camera/avatar design with the historical driving, Volta mission, local saves, source-module MORABEZA naming and proposed MORABEZZA game identity. Do not rename Unreal packages or edit either map in this review.
+
+### AD-01/AD-02 product definition follow-up — 2026-09-25
+
+A [versioned MORABEZZA game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md) now records the founder's previously expressed MMO/isometric direction, the accepted named heroine visual reference and the historical life-sandbox/M0 feature disposition questions. **AD-01 MMO avatar model remains undecided; AD-02 genre direction is recorded, but formal scope and legacy-feature disposition are pending.** The historical README and game-design foundation remain intact. No technical implementation acceptance follows from the candidate.
 
 ## 6. Gate statement and source register
 
