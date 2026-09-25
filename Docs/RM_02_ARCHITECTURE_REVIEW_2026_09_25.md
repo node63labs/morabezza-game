@@ -1,7 +1,7 @@
 # RM-02 — MORABEZZA MMO Architecture Review (2026-09-25)
 
 **Disposition: SOURCE REVIEW COMPLETE; ARCHITECTURE APPROVAL ON HOLD.**
-**PC-01 subsequent disposition (2026-09-25): FOUNDER DECISION RECORDED — MORABEZZA is an independent NODE63 game product. The approved portfolio charter has NOT yet been amended; AD-01–AD-07 and the remaining architecture acceptance gates are still pending.**
+**PC-01/AD-01 subsequent dispositions (2026-09-25): founder recorded independent MORABEZZA product classification and AD-01 OPTION B (distinct player characters; Morabezza remains central story heroine). Approved portfolio charter incorporation, AD-02–AD-07 and the remaining architecture acceptance gates are pending.**
 **Scope:** Documentation and source review only. No game code, map, LFS object, repository setting or production service changed.
 **Review baseline:** draft PR #3 at bf50e288f7be71b772b90826a25d75a96587d44c; its audited game main at af8f3d0e5f9291b1358232c7055190e4bd57b9f6.
 **Later source inspected independently:** draft PR #11 at 155168e7b29e521f59cc64bfd0e2b5274c3790ed. PR #11 is NOT an ancestor of PR #3.
@@ -63,7 +63,9 @@ A versioned product-definition delta must reconcile the proposed camera/avatar d
 
 ### AD-01/AD-02 product definition follow-up — 2026-09-25
 
-A [versioned MORABEZZA game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md) now records the founder's previously expressed MMO/isometric direction, the accepted named heroine visual reference and the historical life-sandbox/M0 feature disposition questions. **AD-01 MMO avatar model remains undecided; AD-02 genre direction is recorded, but formal scope and legacy-feature disposition are pending.** The historical README and game-design foundation remain intact. No technical implementation acceptance follows from the candidate.
+A [versioned MORABEZZA game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md) now records the founder's previously expressed MMO/isometric direction, the accepted named heroine visual reference and the historical life-sandbox/M0 feature disposition questions. **AD-01 OPTION B is now founder-decided: players have distinct characters while Morabezza remains the central story heroine. AD-02 genre direction is recorded, but formal scope and historical M0/Volta/vehicle disposition are pending.** The historical README and game-design foundation remain intact. No technical implementation acceptance follows from the candidate.
+
+The [standalone AD-01 founder decision record](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/AD_01_PLAYER_CHARACTERS_AND_STORY_HEROINE_DECISION_2026_09_25.md) preserves the distinction between player-character identity and the named heroine; her exact playable-versus-non-player treatment and character-account schema are not approved by the avatar choice.
 
 ## 6. Gate statement and source register
 
@@ -71,7 +73,7 @@ A [versioned MORABEZZA game product-definition candidate](https://github.com/nod
 
 **Not performed:** founder/portfolio decision, canonical map selection, identity service, database creation, security remediation, engine build, LFS hydration on a new machine, game launch, network test, or GitHub Actions.
 
-**Review result (updated 2026-09-25):** PC-01 founder classification is recorded as an independent game product; its incorporation into the approved portfolio charter and AD-01–AD-07 remain pending. Technical architecture approval, Unreal compilation and gameplay acceptance remain on hold. The original PR #3 documents, gameplay source and `main` remain unchanged.
+**Review result (updated 2026-09-25):** PC-01 founder classification and AD-01 Option B are recorded; PC-01 incorporation into the approved portfolio charter and AD-02–AD-07 remain pending. Technical architecture approval, Unreal compilation and gameplay acceptance remain on hold. The original PR #3 documents, gameplay source and `main` remain unchanged.
 
 - [Original architecture candidate in PR #3](https://github.com/node63labs/morabezza-game/blob/design/rm-02-mmo-architecture-candidate/Docs/RM_02_MMO_RUNTIME_ARCHITECTURE_V1_CANDIDATE.md)
 - [Original source-migration register in PR #3](https://github.com/node63labs/morabezza-game/blob/design/rm-02-mmo-architecture-candidate/Docs/RM_02_SOURCE_MIGRATION_AND_REMOTE_WORK_PLAN.md)
