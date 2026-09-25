@@ -80,10 +80,10 @@ def inspect(project: Path, engine: Path | None, candidate_sha: str,
         result["candidate_sha_actual"] = actual if code == 0 else None
         if code != 0 or actual.lower() != candidate_sha.lower():
             blockers.append("PINNED_GIT_HEAD_MISMATCH")
-        code, status = command([git, "status", "--porcelain", "--untracked-files=no"], project)
-        result["tracked_tree_clean"] = code == 0 and not status
-        if not result["tracked_tree_clean"]:
-            blockers.append("TRACKED_WORKTREE_NOT_CLEAN_OR_UNREADABLE")
+        code, status = command([git, "status", "--porcelain", "--untracked-files=normal"], project)
+        result["worktree_clean"] = code == 0 and not status
+        if not result["worktree_clean"]:
+            blockers.append("WORKTREE_NOT_CLEAN_OR_UNREADABLE")
         code, version = command([git, "lfs", "version"], project)
         result["git_lfs_available"] = code == 0
         result["git_lfs_version"] = version if code == 0 else None
