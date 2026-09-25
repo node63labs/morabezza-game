@@ -1,7 +1,7 @@
 # RM-02 — Architecture and Portfolio Decision Register
 
 **Date:** 2026-09-25
-**Status:** PC-01, AD-01 AND AD-02 PRODUCT DECISIONS RECORDED (2026-09-25); AD-03–AD-07 PENDING; PC-01 APPROVED PORTFOLIO CHARTER INCORPORATION PENDING.
+**Status:** PC-01, AD-01 AND AD-02 PRODUCT DECISIONS RECORDED; AD-03 BOUNDED FIRST-ZONE TOPOLOGY DOCUMENTED FOR FOUNDER REVIEW; AD-04–AD-07 PENDING; PC-01 APPROVED CHARTER INCORPORATION PENDING.
 **Companion:** RM_02_ARCHITECTURE_REVIEW_2026_09_25.md, separate draft review PR stacked on original architecture PR #3.
 **Owner of decision record:** NODE63 Labs founder, with product-domain and security/architecture review as applicable.
 **Scope control:** PC-01 records the founder's explicit independent-game product classification. The approved portfolio charter remains unchanged until a separate controlled governance update; this register does not assign game priority, approve implementation, merge a PR or approve production.
@@ -14,7 +14,7 @@
 
 **Recorded governance decision:** [NODE63 PC-01 founder decision](https://github.com/node63labs/node63-governance/blob/governance/pc-01-morabezza-independent-game-20260925/portfolio/decisions/PC_01_MORABEZZA_INDEPENDENT_GAME_2026_09_25.md). A controlled [draft governance PR #15](https://github.com/node63labs/node63-governance/pull/15) now proposes its v1.1 charter incorporation. **Governance `main` and its approved v1.0 charter remain unchanged** until separately approved/merged; the first PR CI attempt failed and does not constitute acceptance. No Morabeza hospitality P5 priority transfers to the game, and no staffing/budget is assigned.
 
-**Decision status:** **FOUNDER APPROVED / RECORDED — APPROVED PORTFOLIO BASELINE UPDATE PENDING.** PC-01 is no longer a founder-choice question. AD-01 Option B and AD-02 product scope are now founder-directed/recorded; AD-03–AD-07 architecture decisions and Unreal build/runtime gates remain separately pending. PC-01 does not authorize game implementation, production login, a paid build host, GitHub Actions or a merge to `main`.
+**Decision status:** **FOUNDER APPROVED / RECORDED — APPROVED PORTFOLIO BASELINE UPDATE PENDING.** PC-01 is no longer a founder-choice question. AD-01 Option B and AD-02 product scope are now founder-directed/recorded; AD-03 bounded topology is prepared for founder review; AD-04–AD-07, build and runtime gates remain pending. PC-01 does not authorize game implementation, production login, a paid build host, GitHub Actions or a merge to `main`.
 
 ## AD-01 — Player-specific characters and Morabezza story heroine
 
@@ -40,13 +40,19 @@
 
 **Status:** AD-02 PRODUCT-DIRECTION / LEGACY-SCOPE DECISION RECORDED; downstream AD-03–AD-07, roadmap integration and gameplay acceptance PENDING.
 
-## AD-03 — Dedicated server topology and first-zone boundary
+## AD-03 — Dedicated server topology and first development-zone boundary
 
-**Question:** approve a one-zone, two-distinct-player disposable development slice without yet deciding single- versus multi-shard production. Is the future directory/session-admission authority MORABEZZA-owned, and what identity/simulation boundary is controlled by the Unreal zone server?
+**Bounded first-slice architecture direction (2026-09-25):** use **one headless UE 5.8 dedicated-server process**, **one disposable development zone**, and **two separately connected Unreal game clients** with distinct player-character identities (AD-01 Option B). One MORABEZZA-owned zone server is authoritative for the active simulation, controller/pawn ownership and valid test interactions; clients render/predict and send intent, but cannot determine shared outcomes.
 
-**Required evidence:** server authority, connection/admission state transitions, controller/pawn ownership, logout cleanup, no cross-zone transition in S0, source-engine availability/cost approval and reproducible target build. World Partition is local world streaming, not automatic multi-server handoff.
+**Planned map path:** `/Game/Dev/MMO_S0_TestZone`, consistent with the S0-W0 harness. **No verified map asset exists yet.** Keep both `Untitled.umap` and `dskjnfkljsdnf.umap` untouched as RM-01 canonical-world candidates. AD-06 separately controls actual map creation and evidence. Do not modify the default game/editor startup maps or use existing canonical candidates as an implicit test zone.
 
-**Status:** DECISION REQUIRED / NO HOST, ENGINE BUILD OR CAPACITY CLAIM.
+**Explicit non-decisions:** no production single-/multi-shard topology, second zone, world-directory deployment, cross-server handoff, provider/region, concurrency/SLO, budget, hardware purchase, publicly exposed network endpoint or release. Server-side admission is MORABEZZA-owned; the actual synthetic dev identity/session contract is **AD-05**, while durable game-state persistence is **AD-04**. World Partition streaming is not multi-server handoff. No first-slice Lariba or hospitality runtime dependency.
+
+**Existing source evidence:** draft PR #11 contains `MORABEZAServer.Target.cs` and `scripts/mmo/s0_two_client_smoke.sh`; target source is uncompiled, and the smoke harness tests **process liveness only**, not network admission or replication. The owner's current environment has no UE 5.8 source-build host; INT-02 and INT-03/04 are not executed.
+
+**Decision artifact:** [AD-03 dedicated-server and first dev-zone boundary](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/AD_03_DEDICATED_SERVER_AND_FIRST_DEV_ZONE_DECISION_2026_09_25.md). It records the bounded one-server/one-zone/two-client design for founder review; it does not infer that the founder has approved a particular hosting, cost, service capacity or production architecture.
+
+**Status:** BOUNDED TECHNICAL DIRECTION DOCUMENTED / FOUNDER ARCHITECTURE SIGN-OFF PENDING; HOST, MAP, AUTH, ENGINE BUILD AND TWO-CLIENT RUNTIME BLOCKED OR NOT VERIFIED.
 
 ## AD-04 — Durable game authority and persistence
 
@@ -86,7 +92,7 @@
 
 1. Incorporate the founder-recorded PC-01 independent-game decision into the **approved** governance baseline through its separate controlled review; game priority/capacity remain undecided. This cannot be replaced by approving a code PR.
 2. Apply AD-01 Option B and the recorded AD-02 MMO/Volta/vehicle disposition to a separately reviewed product-documentation and milestone migration. Retain historical single-player docs until the migration is reviewed; do not treat the new camera/character/gameplay code as accepted.
-3. Resolve AD-03/05 to scope **S0-W2 character/session identity and single-zone admission**. S0-W1a/b/c already contain draft dev-contact server RPC and HUD changes; no duplicate implementation or acceptance by renaming.
+3. Review/approve the bounded AD-03 single-server zone direction, then resolve AD-05 for **S0-W2 character/session identity and single-zone admission**. S0-W1a/b/c already contain draft dev-contact server RPC and HUD changes; do not duplicate that work or call it authenticated admission.
 4. Resolve AD-04 before durable rewards, inventory or database work. Resolve AD-06 before map/Unreal runtime tests. Resolve AD-07 before redistributing unverified engine/artist assets or shipping.
 5. Review the separate public configuration token field under the appropriate security/change-control procedure; do not quote the value in PRs, logs or prompts. Its validity has not been proven.
 6. Maintain PRs #3–#11 as **draft** under their existing branch dependencies. Actual INT-02 Unreal compilation and INT-03/04 two-client tests remain missing; no GitHub Actions or paid build host is requested by this register.
@@ -102,4 +108,4 @@
 - Approval date / reviewer identity: [owner to provide]
 - Resulting allowed implementation PR and acceptance criteria: [owner to provide]
 
-**PC-01, AD-01 and AD-02 product decisions are recorded. PC-01 approved portfolio-baseline incorporation, AD-03–AD-07 architecture decisions, historical public-documentation migration and all implementation-specific acceptance remain PENDING.**
+**PC-01, AD-01 and AD-02 product decisions are recorded; AD-03 bounded technical direction is documented for founder review. PC-01 charter incorporation, AD-03 sign-off, AD-04–AD-07, historical documentation migration and implementation-specific acceptance remain PENDING.**
