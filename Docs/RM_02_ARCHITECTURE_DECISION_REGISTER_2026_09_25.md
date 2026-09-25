@@ -1,7 +1,7 @@
 # RM-02 — Architecture and Portfolio Decision Register
 
 **Date:** 2026-09-25
-**Status:** PC-01 FOUNDER DECISION RECORDED (2026-09-25); AD-01–AD-07 PENDING; APPROVED PORTFOLIO CHARTER INCORPORATION PENDING.
+**Status:** PC-01 AND AD-01 FOUNDER DECISIONS RECORDED (2026-09-25); AD-02–AD-07 PENDING; PC-01 APPROVED PORTFOLIO CHARTER INCORPORATION PENDING.
 **Companion:** RM_02_ARCHITECTURE_REVIEW_2026_09_25.md, separate draft review PR stacked on original architecture PR #3.
 **Owner of decision record:** NODE63 Labs founder, with product-domain and security/architecture review as applicable.
 **Scope control:** PC-01 records the founder's explicit independent-game product classification. The approved portfolio charter remains unchanged until a separate controlled governance update; this register does not assign game priority, approve implementation, merge a PR or approve production.
@@ -16,15 +16,15 @@
 
 **Decision status:** **FOUNDER APPROVED / RECORDED — APPROVED PORTFOLIO BASELINE UPDATE PENDING.** PC-01 is no longer a founder-choice question. The architectural AD-01–AD-07 decisions and Unreal build/runtime gates remain separately pending. PC-01 does not authorize game implementation, production login, a paid build host, GitHub Actions or a merge to `main`.
 
-## AD-01 — Player avatar and the named protagonist
+## AD-01 — Player-specific characters and Morabezza story heroine
 
-**Question:** does every player control a customized avatar, an individual character with a unique name, or a shared narrative protagonist rendered independently for each account? Define the canonical relationship of the historical named Morabeza hero to individual account-owned characters.
+**Founder decision — 2026-09-25: OPTION B.** Each player controls their **own distinct player character** in the MORABEZZA shared world; players do **not** each control the named heroine. **Morabezza remains the central authored story heroine** and retains her established visual concept. This resolves the AD-01 avatar-versus-heroine product-design choice.
 
-**Source-preserved concept:** the founder previously accepted a female protagonist named Morabezza and her character visual reference; that approval is **not** a selection of account-specific MMO avatar identity. The [game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md) lists three mutually exclusive character-model approaches without converting the heroine into an NPC by inference.
+**Decision authority and record:** [AD-01 founder decision — Option B](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/AD_01_PLAYER_CHARACTERS_AND_STORY_HEROINE_DECISION_2026_09_25.md), on this draft review branch. The [game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md) reflects the founder's choice without replacing the historical game-design document on `main`.
 
-**Required evidence:** explicit founder choice of player avatar/protagonist relationship, unique account/character identity, visual-rights/cosmetic limits, cardinality, distinct two-player presentation and historical narrative disposition.
+**Explicitly undecided:** the heroine's exact interactive/playable-versus-non-player role, account-to-character cardinality, avatar customization scope, character naming rules, identity schema, storage, quests and asset rights. AD-01 does not by itself authorize character/account implementation, production authentication, Unreal builds, game release or merge of this draft PR.
 
-**Status:** FOUNDER CHARACTER VISUAL DIRECTION RECORDED / MMO AVATAR MODEL DECISION PENDING; NO CHARACTER SCHEMA AUTHORIZED.
+**Status:** FOUNDER DECISION APPROVED / RECORDED — OPTION B; technical contract and implementation acceptance pending AD-02–AD-07 and the corresponding engineering gates.
 
 ## AD-02 — MMO game direction and historical M0 disposition
 
@@ -80,8 +80,8 @@
 
 ## Implementation sequence and review handoff
 
-1. Resolve PC-01 and the portfolio capacity/scope decision in the **approved** governance record. This cannot be replaced by approving a code PR.
-2. Resolve AD-01/02 before definitive character/camera/product changes. Retain historical single-player docs until the signed-off migration delta exists.
+1. Incorporate the founder-recorded PC-01 independent-game decision into the **approved** governance baseline through its separate controlled review; game priority/capacity remain undecided. This cannot be replaced by approving a code PR.
+2. Apply founder-recorded AD-01 Option B to product-definition planning and resolve AD-02 before definitive character/camera/product changes. Retain historical single-player docs until the signed-off migration delta exists.
 3. Resolve AD-03/05 to scope **S0-W2 character/session identity and single-zone admission**. S0-W1a/b/c already contain draft dev-contact server RPC and HUD changes; no duplicate implementation or acceptance by renaming.
 4. Resolve AD-04 before durable rewards, inventory or database work. Resolve AD-06 before map/Unreal runtime tests. Resolve AD-07 before redistributing unverified engine/artist assets or shipping.
 5. Review the separate public configuration token field under the appropriate security/change-control procedure; do not quote the value in PRs, logs or prompts. Its validity has not been proven.
@@ -89,7 +89,7 @@
 
 ## Approval record template — not yet signed
 
-- Decision ID: [PC-01 / AD-01 … AD-07]
+- Decision ID: [PC-01 / AD-01 … AD-07; PC-01 and AD-01 founder choices recorded]
 - Approved alternative and explicit exclusions: [owner to provide]
 - Effective approved source document/version and commit: [owner to provide]
 - Accountable product owner / independent reviewer: [owner to provide]
@@ -98,4 +98,4 @@
 - Approval date / reviewer identity: [owner to provide]
 - Resulting allowed implementation PR and acceptance criteria: [owner to provide]
 
-**Until populated and explicitly accepted, every entry remains PENDING.**
+**PC-01 and AD-01 founder choices are recorded. The approved portfolio-baseline incorporation of PC-01, formal AD-02–AD-07 decisions and any implementation-specific acceptance remain PENDING.**
