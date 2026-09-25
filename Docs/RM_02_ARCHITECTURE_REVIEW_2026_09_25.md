@@ -1,7 +1,7 @@
 # RM-02 — MORABEZZA MMO Architecture Review (2026-09-25)
 
 **Disposition: SOURCE REVIEW COMPLETE; ARCHITECTURE APPROVAL ON HOLD.**
-**PC-01/AD-01 subsequent dispositions (2026-09-25): founder recorded independent MORABEZZA product classification and AD-01 OPTION B (distinct player characters; Morabezza remains central story heroine). Approved portfolio charter incorporation, AD-02–AD-07 and the remaining architecture acceptance gates are pending.**
+**PC-01/AD-01/AD-02 subsequent dispositions (2026-09-25): founder-recorded independent MORABEZZA product classification, distinct player characters / central Morabezza story heroine (AD-01 Option B), and shared-world elevated/isometric MMORPG with Volta/vehicles retained as later MMO features (AD-02). Approved charter incorporation, AD-03–AD-07 and runtime acceptance remain pending.**
 **Scope:** Documentation and source review only. No game code, map, LFS object, repository setting or production service changed.
 **Review baseline:** draft PR #3 at bf50e288f7be71b772b90826a25d75a96587d44c; its audited game main at af8f3d0e5f9291b1358232c7055190e4bd57b9f6.
 **Later source inspected independently:** draft PR #11 at 155168e7b29e521f59cc64bfd0e2b5274c3790ed. PR #11 is NOT an ancestor of PR #3.
@@ -42,7 +42,7 @@ The original PR #3 docs and later PR #11 code have different Git ancestry. PRs #
 | ID | Review item | Required resolution |
 | --- | --- | --- |
 | GOV-01 | Approved hospitality-product charter does not yet contain the game. | PC-01 founder choice resolved as **independent game product**; incorporate it into a controlled approved portfolio revision before asserting registered product status, roadmap priority or implementation authorization. |
-| PROD-01 | Old single-player/life-sandbox definition versus proposed MMORPG and named protagonist. | Approve AD-01 and AD-02, preserving historical requirements and explicit deferrals. |
+| PROD-01 | Historical single-player/life-sandbox scope versus the shared-world MMORPG and named heroine. | AD-01 Option B and AD-02 product/legacy disposition recorded. Keep the historical README/M0 as evidence until a separately reviewed documentation/roadmap migration; Volta and vehicles are later MMO features. |
 | NET-01 | One-zone two-player experiment versus unspecified single-/multi-shard production topology. | AD-03 must distinguish the first disposable test-zone topology from any later shard transfer; no invented population or performance targets. |
 | ID-01 | Unreal controller ownership is not account-to-character authorization. No ticket issuer/verifier, revocation, session fencing or reconnect contract evidenced in inspected game source. | AD-05: product-owned account and character binding, audience-bound short-lived ticket, exact zone/session revision, nonce/replay rejection, revocation, reconnect and mismatched-owner negative tests. Production authentication remains a separate gate. |
 | DATA-01 | PlayerState local mutators and client SaveGame are not shared-game economic truth. | AD-04: game-owned persistence and transaction boundary, atomic idempotent rewards, concurrent-spend rejection, reconnect consistency and private inventory views. PostgreSQL remains only a storage candidate. |
@@ -63,9 +63,9 @@ A versioned product-definition delta must reconcile the proposed camera/avatar d
 
 ### AD-01/AD-02 product definition follow-up — 2026-09-25
 
-A [versioned MORABEZZA game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md) now records the founder's previously expressed MMO/isometric direction, the accepted named heroine visual reference and the historical life-sandbox/M0 feature disposition questions. **AD-01 OPTION B is now founder-decided: players have distinct characters while Morabezza remains the central story heroine. AD-02 genre direction is recorded, but formal scope and historical M0/Volta/vehicle disposition are pending.** The historical README and game-design foundation remain intact. No technical implementation acceptance follows from the candidate.
+A [versioned MORABEZZA game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md) now records the founder's previously expressed MMO/isometric direction, the accepted named heroine visual reference and the historical life-sandbox/M0 feature disposition questions. **AD-01 Option B and AD-02 product direction are now recorded: distinct player characters, central Morabezza story heroine, elevated/isometric MMORPG; Volta is a later MMO story/onboarding quest and vehicles are later MMO gameplay. The historical M0/README public-documentation migration remains separate.** The historical README and game-design foundation remain intact. No technical implementation acceptance follows from the candidate.
 
-The [standalone AD-01 founder decision record](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/AD_01_PLAYER_CHARACTERS_AND_STORY_HEROINE_DECISION_2026_09_25.md) preserves the distinction between player-character identity and the named heroine; her exact playable-versus-non-player treatment and character-account schema are not approved by the avatar choice.
+The [standalone AD-01 founder decision record](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/AD_01_PLAYER_CHARACTERS_AND_STORY_HEROINE_DECISION_2026_09_25.md) preserves the distinction between player identity and the heroine; her exact playable-versus-non-player role remains a later decision. The [AD-02 product/legacy-scope record](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/AD_02_MMO_PRODUCT_DEFINITION_AND_LEGACY_SCOPE_DECISION_2026_09_25.md) preserves Volta and driving while excluding both from MMO-S0.1. Neither record approves character schema, gameplay code or an engine build.
 
 ## 6. Gate statement and source register
 
@@ -73,7 +73,7 @@ The [standalone AD-01 founder decision record](https://github.com/node63labs/mor
 
 **Not performed:** founder/portfolio decision, canonical map selection, identity service, database creation, security remediation, engine build, LFS hydration on a new machine, game launch, network test, or GitHub Actions.
 
-**Review result (updated 2026-09-25):** PC-01 founder classification and AD-01 Option B are recorded; PC-01 incorporation into the approved portfolio charter and AD-02–AD-07 remain pending. Technical architecture approval, Unreal compilation and gameplay acceptance remain on hold. The original PR #3 documents, gameplay source and `main` remain unchanged.
+**Review result (updated 2026-09-25):** PC-01 classification, AD-01 Option B and AD-02 MMO/Volta/vehicle disposition are recorded; PC-01 incorporation into the approved portfolio charter, AD-03–AD-07 and accepted implementation evidence remain pending. Technical architecture approval, Unreal compilation and gameplay acceptance remain on hold. The original PR #3 documents, gameplay source and `main` remain unchanged.
 
 - [Original architecture candidate in PR #3](https://github.com/node63labs/morabezza-game/blob/design/rm-02-mmo-architecture-candidate/Docs/RM_02_MMO_RUNTIME_ARCHITECTURE_V1_CANDIDATE.md)
 - [Original source-migration register in PR #3](https://github.com/node63labs/morabezza-game/blob/design/rm-02-mmo-architecture-candidate/Docs/RM_02_SOURCE_MIGRATION_AND_REMOTE_WORK_PLAN.md)
