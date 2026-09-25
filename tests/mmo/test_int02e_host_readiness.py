@@ -62,7 +62,7 @@ class Int02EHostReadinessTests(unittest.TestCase):
             calls.append(args[1:])
             if args[1:] == ["rev-parse", "HEAD"]:
                 return 0, actual
-            if args[1:] == ["status", "--porcelain", "--untracked-files=no"]:
+            if args[1:] == ["status", "--porcelain", "--untracked-files=normal"]:
                 return 0, ""
             if args[1:] == ["lfs", "version"]:
                 return 0, "git-lfs/3.6.0"
@@ -96,7 +96,7 @@ class Int02EHostReadinessTests(unittest.TestCase):
         self.assertFalse(report["production_or_main_authorized"])
         self.assertEqual(report["builds_executed"], 0)
         self.assertEqual(calls, [["rev-parse", "HEAD"],
-                                 ["status", "--porcelain", "--untracked-files=no"],
+                                 ["status", "--porcelain", "--untracked-files=normal"],
                                  ["lfs", "version"]])
 
     def test_wrong_pinned_sha_blocks_even_when_other_prerequisites_present(self):
