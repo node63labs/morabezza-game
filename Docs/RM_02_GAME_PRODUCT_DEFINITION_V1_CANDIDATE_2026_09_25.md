@@ -2,7 +2,7 @@
 
 **Document ID:** MORABEZZA-PD-01  
 **Date:** 2026-09-25  
-**Status:** CANDIDATE / AD-01 AND AD-02 FINAL DISPOSITION PENDING  
+**Status:** CANDIDATE / AD-01 OPTION B FOUNDER DECISION RECORDED; AD-02 HISTORICAL-SCOPE DISPOSITION PENDING  
 **Product boundary:** MORABEZZA, independent NODE63 game product; PC-01 founder decision recorded. Governance charter v1.1 PC-01 candidate is under draft review, not yet accepted into governance `main`.  
 **Source authority:** historical `README.md` and `Docs/GAME_DESIGN.md` on `morabezza-game/main@af8f3d0e5f9291b1358232c7055190e4bd57b9f6`; original RM-02 candidate PR #3; architecture-review PR #12; latest later source candidate PR #11. These sources have different ancestry and approval states.  
 **Change class:** product definition / documentation only. No historical document is overwritten, and no technical, budget, staffing or implementation authority is granted.
@@ -17,16 +17,13 @@ The founder's previously selected presentation direction is an elevated/isometri
 
 **Product/legal identity:** `MORABEZZA` is the game product, while `Morabeza` remains the separate hospitality product. The UE project/module/package spelling remains `MORABEZA` until an independent Unreal migration review. NODE63 LABS owns portfolio governance. MORABEZZA owns its game-domain policy and data. No identity, permission, economy, secret, release or roadmap status is inherited from hospitality or Lariba.
 
-## 2. Original main-character visual reference — without inventing multiplayer identity
+## 2. AD-01 — Player-specific characters; Morabezza remains the story heroine
+
+**Founder decision recorded 2026-09-25: OPTION B.** Players create or select **their own distinct player characters** in the shared world; they do not each play as an instance of the named heroine. **Morabezza remains the central authored story heroine**, preserving the original character's narrative importance and previously approved visual reference. [AD-01 decision record](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/AD_01_PLAYER_CHARACTERS_AND_STORY_HEROINE_DECISION_2026_09_25.md).
 
 The founder previously accepted the **female main-character visual concept named Morabezza**, with dark curly hair/navy headband, warm brown skin, cream T-shirt, blue shorts, sandals, blue pendant and bracelets. Character design and asset-handling approval remain separate from player-account authorization and asset licensing. Visual materials must preserve the accepted orientation of collar/necklace/accessories.
 
-**AD-01 is unresolved:** the prior visual approval and name do not establish whether:
-- **A — Shared named protagonist:** each player controls a distinct game session/character instance of the named Morabezza hero.
-- **B — Player-specific avatars:** each player creates or selects an individual character; Morabezza remains a prominent named narrative character, with a separately decided playable or NPC role.
-- **C — Bounded authored archetypes:** unique account-owned characters use authored appearances/story roles derived from the creative direction, with the named protagonist's precise role documented separately.
-
-The founder must choose the character/hero model before account-to-character cardinality, cosmetics, narrative continuity, cross-player identity or database schema can be accepted. None of A/B/C is selected in this document. No approved protagonist is silently converted to an NPC.
+The product identity contract now distinguishes **player characters** from **Morabezza as an authored heroine**. The exact way players create/select and customize a character, available cosmetics, naming uniqueness, number of character slots per account, narrative/quest presentation and heroine's possible bounded playable/non-player role require separately scoped product and implementation decisions. **Option B does not silently reclassify Morabezza as an NPC or approve special playable chapters.** Production account authorization, character schemas and cross-player isolation require AD-04/AD-05 and Unreal runtime evidence.
 
 ## 3. Source-preserving transition from the historical action/life sandbox
 
@@ -63,7 +60,7 @@ No `main` README, `Docs/GAME_DESIGN.md`, M0 milestone or issue is silently renam
 
 ## 6. Founder decisions remaining to close this version
 
-**AD-01:** choose A/B/C (or specify an alternative), explicitly deciding the named Morabezza protagonist's playable/story role and whether two simultaneous players may share the heroine's appearance/name.
+**AD-01 — DECIDED, OPTION B:** each player has their own character and Morabezza remains the central story heroine. Her exact interactive/playable-versus-non-player treatment, character-creation rules and technical identity contract remain separate design/implementation decisions. The product-definition candidate preserves the founder-approved direction; it does not authorize gameplay code or character schema.
 
 **AD-02:** affirm the previously selected shared-world isometric MMORPG as the accepted game definition and explicitly disposition the historical M0 obligations. In particular choose whether **Volta and vehicle gameplay** become later MMO features, remain in a separate legacy/single-player mode, or are retired in a separately documented scope decision. The broader vision may retain adventure/story elements without claiming the original third-person M0 was already achieved.
 
@@ -71,4 +68,4 @@ No `main` README, `Docs/GAME_DESIGN.md`, M0 milestone or issue is silently renam
 
 ## 7. Review outcome
 
-**Completed now:** a versioned, source-grounded product-definition candidate that recognizes the founder's MMO/isometric direction, keeps the accepted protagonist visual concept, preserves and disposition-tracks historical M0 material, and defines a bounded future first slice. **Not completed:** founder AD-01 character-model selection, formal AD-02 legacy-feature disposition, portfolio charter admission on `main`, Unreal runtime or multiplayer acceptance.
+**Completed now:** a versioned, source-grounded product-definition candidate that recognizes the founder's MMO/isometric direction, keeps the accepted protagonist visual concept, preserves and disposition-tracks historical M0 material, and defines a bounded future first slice. **Not completed:** formal AD-02 legacy-feature disposition, heroine's precise gameplay role, character creation/identity schema, portfolio charter admission on `main`, Unreal runtime or multiplayer acceptance. **AD-01 Option B founder selection is recorded** without treating the entire product-definition candidate as approved.
