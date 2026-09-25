@@ -12,7 +12,7 @@
 
 **Identity and authority:** `MORABEZZA` is the game product; `Morabeza` remains the separate hospitality product. The existing game repository is `node63labs/morabezza-game`, while the Unreal project/module stays `MORABEZA` until a separately reviewed rename. MORABEZZA requires its own game-domain authority, character/session/data boundaries and release approval; it inherits no hospitality database, secrets, permissions or release acceptance.
 
-**Recorded governance decision:** [NODE63 PC-01 independent-game founder decision](https://github.com/node63labs/node63-governance/blob/governance/pc-01-morabezza-independent-game-20260925/portfolio/decisions/PC_01_MORABEZZA_INDEPENDENT_GAME_2026_09_25.md), recorded on a separate governance branch from approved charter v1.0. It has **not** amended governance `main` or the approved charter. Its incorporation into an approved portfolio/charter revision is still required; that update must separately record accountable product owner, roadmap priority, resourcing, lifecycle and repository mapping. No existing Morabeza P5 priority transfers automatically.
+**Recorded governance decision:** [NODE63 PC-01 founder decision](https://github.com/node63labs/node63-governance/blob/governance/pc-01-morabezza-independent-game-20260925/portfolio/decisions/PC_01_MORABEZZA_INDEPENDENT_GAME_2026_09_25.md). A controlled [draft governance PR #15](https://github.com/node63labs/node63-governance/pull/15) now proposes its v1.1 charter incorporation. **Governance `main` and its approved v1.0 charter remain unchanged** until separately approved/merged; the first PR CI attempt failed and does not constitute acceptance. No Morabeza hospitality P5 priority transfers to the game, and no staffing/budget is assigned.
 
 **Decision status:** **FOUNDER APPROVED / RECORDED — APPROVED PORTFOLIO BASELINE UPDATE PENDING.** PC-01 is no longer a founder-choice question. The architectural AD-01–AD-07 decisions and Unreal build/runtime gates remain separately pending. PC-01 does not authorize game implementation, production login, a paid build host, GitHub Actions or a merge to `main`.
 
@@ -20,17 +20,21 @@
 
 **Question:** does every player control a customized avatar, an individual character with a unique name, or a shared narrative protagonist rendered independently for each account? Define the canonical relationship of the historical named Morabeza hero to individual account-owned characters.
 
-**Required evidence:** chosen product experience, character ID uniqueness, visual-rights/cosmetic limits, account-to-character cardinality, how two simultaneous players remain distinguishable, and the retention or deferral of historical narrative assets.
+**Source-preserved concept:** the founder previously accepted a female protagonist named Morabezza and her character visual reference; that approval is **not** a selection of account-specific MMO avatar identity. The [game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md) lists three mutually exclusive character-model approaches without converting the heroine into an NPC by inference.
 
-**Status:** DECISION REQUIRED / NO CHARACTER SCHEMA AUTHORIZED.
+**Required evidence:** explicit founder choice of player avatar/protagonist relationship, unique account/character identity, visual-rights/cosmetic limits, cardinality, distinct two-player presentation and historical narrative disposition.
 
-## AD-02 — Approved game genre, scope and historical M0
+**Status:** FOUNDER CHARACTER VISUAL DIRECTION RECORDED / MMO AVATAR MODEL DECISION PENDING; NO CHARACTER SCHEMA AUTHORIZED.
 
-**Question:** is the target a multiplayer expansion of the Cape Verdean life-sandbox, a new isometric MMORPG product direction, or a separately scoped experimental MMO mode? Which prior M0 features (vehicle/Volta mission, local saves, economy and third-person camera) are retained, deferred or explicitly superseded?
+## AD-02 — MMO game direction and historical M0 disposition
 
-**Required evidence:** versioned product-definition delta, approved vertical-slice acceptance, updated public README only after acceptance and a mapping from historical M0 to proposed MMO-S0.1. Fix the README's UE 5.6 statement only with the verified UE 5.8 project/toolchain baseline.
+**Founder direction already expressed:** elevated/isometric shared-world MMO/MMORPG with visible other players, resources and enemies, a readable smaller-character camera and MMO hotbar/social UX. This is a legitimate product target, not a completed large-scale deployed MMO or Unreal build.
 
-**Status:** DECISION REQUIRED / NO SILENT PRODUCT-DESIGN REPLACEMENT.
+**Versioned [game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md):** reconciles that direction with the historical action/life-sandbox, Volta mission, prototype driving, local saves and M0.1/M0.2 obligations without editing or declaring those main-branch artifacts superseded.
+
+**Founder decision still required:** explicitly approve the candidate as the product-definition baseline and select a controlled disposition for Volta/vehicle gameplay and the prior single-player M0: later MMO features, separate legacy/single-player mode, or explicit retirement. No automatic feature removal, engine change, map conversion, reward/persistence implementation or public README rewrite.
+
+**Status:** MMO/ISOMETRIC DIRECTION RECORDED / FORMAL AD-02 SCOPE AND HISTORICAL-M0 DISPOSITION PENDING.
 
 ## AD-03 — Dedicated server topology and first-zone boundary
 
