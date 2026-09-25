@@ -1,23 +1,20 @@
 # RM-02 — Architecture and Portfolio Decision Register
 
 **Date:** 2026-09-25
-**Status:** PENDING FOUNDER / OWNER DECISIONS. No decision below is presumed approved.
+**Status:** PC-01 FOUNDER DECISION RECORDED (2026-09-25); AD-01–AD-07 PENDING; APPROVED PORTFOLIO CHARTER INCORPORATION PENDING.
 **Companion:** RM_02_ARCHITECTURE_REVIEW_2026_09_25.md, separate draft review PR stacked on original architecture PR #3.
 **Owner of decision record:** NODE63 Labs founder, with product-domain and security/architecture review as applicable.
-**Scope control:** this register records questions, bounded alternatives, required evidence and explicit acceptance; it does not create product identity, modify a portfolio charter, authorize game implementation, merge a PR or approve a production release.
+**Scope control:** PC-01 records the founder's explicit independent-game product classification. The approved portfolio charter remains unchanged until a separate controlled governance update; this register does not assign game priority, approve implementation, merge a PR or approve production.
 
-## PC-01 — What product is this game?
+## PC-01 — Independent MORABEZZA game product
 
-**Why blocking:** Approved NODE63 Portfolio Charter v1.0 identifies Morabeza as a **hospitality-oriented incubation product**. The MORABEZZA game is not named in that approved charter. The supplied Master Roadmap v1.4 is a draft revision. Similar product names cannot independently establish shared domain authority, release governance, investment priority or a shared database.
+**Founder decision — 2026-09-25:** The founder explicitly chose **alternative A: MORABEZZA is an independent NODE63 game product under NODE63 LABS**, not a game subproject of the existing **Morabeza hospitality product**. Product independence does not create a separate legal company.
 
-**Owner must choose and record one governed relationship:**
-- A. MORABEZZA is a new independent game product with its own product charter, repository mapping, accountable owner and separately approved roadmap placement.
-- B. MORABEZZA is an explicitly scoped game subproject of existing Morabeza, requiring an approved change to the hospitality product charter and a separation of game/hospitality data and authority.
-- C. Another product name and governance placement, explicitly recorded in the approved portfolio source.
+**Identity and authority:** `MORABEZZA` is the game product; `Morabeza` remains the separate hospitality product. The existing game repository is `node63labs/morabezza-game`, while the Unreal project/module stays `MORABEZA` until a separately reviewed rename. MORABEZZA requires its own game-domain authority, character/session/data boundaries and release approval; it inherits no hospitality database, secrets, permissions or release acceptance.
 
-**Required evidence:** changed and accepted portfolio document; exact product code/name, domain owner, roadmap position, permitted resource budget and relationship to the existing hospitality product. Existing technical Unreal module/package MORABEZA need not be renamed as part of this governance decision.
+**Recorded governance decision:** [NODE63 PC-01 independent-game founder decision](https://github.com/node63labs/node63-governance/blob/governance/pc-01-morabezza-independent-game-20260925/portfolio/decisions/PC_01_MORABEZZA_INDEPENDENT_GAME_2026_09_25.md), recorded on a separate governance branch from approved charter v1.0. It has **not** amended governance `main` or the approved charter. Its incorporation into an approved portfolio/charter revision is still required; that update must separately record accountable product owner, roadmap priority, resourcing, lifecycle and repository mapping. No existing Morabeza P5 priority transfers automatically.
 
-**Status:** DECISION REQUIRED / NOT APPROVED. Do not copy Morabeza's P5 classification to the game by inference.
+**Decision status:** **FOUNDER APPROVED / RECORDED — APPROVED PORTFOLIO BASELINE UPDATE PENDING.** PC-01 is no longer a founder-choice question. The architectural AD-01–AD-07 decisions and Unreal build/runtime gates remain separately pending. PC-01 does not authorize game implementation, production login, a paid build host, GitHub Actions or a merge to `main`.
 
 ## AD-01 — Player avatar and the named protagonist
 
