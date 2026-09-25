@@ -3,8 +3,8 @@
 **Decision ID:** MORABEZZA-AD-03  
 **Date:** 2026-09-25  
 **Decision class:** Bounded first-slice runtime architecture; source/design review, no runtime acceptance.  
-**Status:** ARCHITECTURE DIRECTION RECORDED FOR FOUNDER REVIEW — IMPLEMENTATION / HOSTING / PRODUCTION TOPOLOGY NOT AUTHORIZED.  
-**Provenance:** The founder requested AD-03 after PC-01 (independent game product), AD-01 Option B (distinct player characters, Morabezza central story heroine), and AD-02 (elevated/isometric shared-world MMORPG; Volta/vehicles later). The one-zone/two-player scope originates in the RM-02 candidate, **not** from an explicit owner-selected cloud provider, machine, capacity or production shard topology.  
+**Status:** FOUNDER APPROVED — BOUNDED AD-03 DESIGN ONLY; IMPLEMENTATION / HOSTING / PRODUCTION TOPOLOGY NOT AUTHORIZED.  
+**Provenance:** The founder explicitly approved the proposed **one-dedicated-server, one-disposable-development-zone, two-independent-client design** on 2026-09-25, after reviewing its bounded scope. This approves AD-03's first-slice architecture, **not** a particular cloud provider, machine, capacity, cost, production shard topology, implementation PR or merge. PC-01, AD-01 Option B and AD-02 remain the prior product decisions.  
 **Review branch:** `review/rm-02-architecture-decision-docket-20260925`, draft PR #12 stacked on draft PR #3. The later S0-W0/W1a/W1b/W1c/INT-02 candidate source exists on separate draft PR #11, not in this branch's Git ancestry.  
 **Game source authority:** `morabezza-game/main@af8f3d0e5f9291b1358232c7055190e4bd57b9f6` remains unchanged.  
 **Governance authority:** MORABEZZA founder classification recorded in PC-01; its approved charter incorporation remains draft governance PR #15.
@@ -71,7 +71,7 @@ For S0 there is **one zone identifier** and **no zone crossing or World Partitio
 
 | Gate | Required future evidence | Current classification |
 | --- | --- | --- |
-| AD-03 design | This bounded one-server/one-zone/two-client topology with owner-reviewed scope and explicit exclusions. | **Design record prepared for founder review; not a build acceptance.** |
+| AD-03 design | This bounded one-server/one-zone/two-client topology with owner-reviewed scope and explicit exclusions. | **FOUNDER APPROVED at the design level; not a build or gameplay acceptance.** |
 | INT-02 host/source | UE 5.8 source engine, supported toolchain/plugins, exact reviewed Git SHA, hydrated LFS packages and clean checkout; Editor/Game/Server UHT+C++ target outputs/logs reviewed. | **BLOCKED — no host or compile.** |
 | AD-06 dev map | Actual disposable `/Game/Dev/MMO_S0_TestZone` package created and verified; original two candidate maps preserved. | **NOT PRESENT / NOT VERIFIED.** |
 | AD-05 session identity | Approved synthetic dev admission first, then versioned character/session binding and negative entry tests; no unreviewed production login. | **PENDING.** |
@@ -85,6 +85,6 @@ The existing `scripts/mmo/s0_two_client_smoke.sh --plan` only validates executab
 
 ## 6. Decision and follow-up classification
 
-**Design direction for owner acceptance:** one **dedicated Unreal 5.8 server**, one **disposable `/Game/Dev/MMO_S0_TestZone`** (planned, not created), **two distinct clients**, **server-authoritative zone**, and **no cross-zone/production topology**. The RM-02 decision register records this as a **bounded architecture direction** in draft PR #12. The founder's request to proceed with AD-03 is not evidence that a particular engine host, spend, capacity, production network or security implementation has been explicitly approved.
+**Founder-approved AD-03 design:** one **dedicated Unreal 5.8 server**, one **disposable `/Game/Dev/MMO_S0_TestZone`** (planned, not created), **two distinct clients**, **server-authoritative zone**, and **no cross-zone/production topology**. The founder approved this exact bounded design on 2026-09-25; the RM-02 register records that approval in draft PR #12. This is **not** approval of an engine host, spend, capacity, production network, security implementation, executable build or source PR merge.
 
 **Still separate:** AD-04 game-owned persistence, AD-05 admission/reconnect, AD-06 dev map and canonical-world separation, AD-07 assets/license, PC-01 governance PR #15 (initial CI failure), full Unreal compilation, two-client runtime and all game PR merges. PRs #3–#12 and the INT-02 source integration stack remain drafts. No implementation claim is promoted by this architecture decision.
