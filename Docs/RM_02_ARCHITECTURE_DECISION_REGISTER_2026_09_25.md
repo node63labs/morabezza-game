@@ -1,7 +1,7 @@
 # RM-02 — Architecture and Portfolio Decision Register
 
 **Date:** 2026-09-25
-**Status:** PC-01 AND AD-01 FOUNDER DECISIONS RECORDED (2026-09-25); AD-02–AD-07 PENDING; PC-01 APPROVED PORTFOLIO CHARTER INCORPORATION PENDING.
+**Status:** PC-01, AD-01 AND AD-02 PRODUCT DECISIONS RECORDED (2026-09-25); AD-03–AD-07 PENDING; PC-01 APPROVED PORTFOLIO CHARTER INCORPORATION PENDING.
 **Companion:** RM_02_ARCHITECTURE_REVIEW_2026_09_25.md, separate draft review PR stacked on original architecture PR #3.
 **Owner of decision record:** NODE63 Labs founder, with product-domain and security/architecture review as applicable.
 **Scope control:** PC-01 records the founder's explicit independent-game product classification. The approved portfolio charter remains unchanged until a separate controlled governance update; this register does not assign game priority, approve implementation, merge a PR or approve production.
@@ -14,7 +14,7 @@
 
 **Recorded governance decision:** [NODE63 PC-01 founder decision](https://github.com/node63labs/node63-governance/blob/governance/pc-01-morabezza-independent-game-20260925/portfolio/decisions/PC_01_MORABEZZA_INDEPENDENT_GAME_2026_09_25.md). A controlled [draft governance PR #15](https://github.com/node63labs/node63-governance/pull/15) now proposes its v1.1 charter incorporation. **Governance `main` and its approved v1.0 charter remain unchanged** until separately approved/merged; the first PR CI attempt failed and does not constitute acceptance. No Morabeza hospitality P5 priority transfers to the game, and no staffing/budget is assigned.
 
-**Decision status:** **FOUNDER APPROVED / RECORDED — APPROVED PORTFOLIO BASELINE UPDATE PENDING.** PC-01 is no longer a founder-choice question. The architectural AD-01–AD-07 decisions and Unreal build/runtime gates remain separately pending. PC-01 does not authorize game implementation, production login, a paid build host, GitHub Actions or a merge to `main`.
+**Decision status:** **FOUNDER APPROVED / RECORDED — APPROVED PORTFOLIO BASELINE UPDATE PENDING.** PC-01 is no longer a founder-choice question. AD-01 Option B and AD-02 product scope are now founder-directed/recorded; AD-03–AD-07 architecture decisions and Unreal build/runtime gates remain separately pending. PC-01 does not authorize game implementation, production login, a paid build host, GitHub Actions or a merge to `main`.
 
 ## AD-01 — Player-specific characters and Morabezza story heroine
 
@@ -24,17 +24,21 @@
 
 **Explicitly undecided:** the heroine's exact interactive/playable-versus-non-player role, account-to-character cardinality, avatar customization scope, character naming rules, identity schema, storage, quests and asset rights. AD-01 does not by itself authorize character/account implementation, production authentication, Unreal builds, game release or merge of this draft PR.
 
-**Status:** FOUNDER DECISION APPROVED / RECORDED — OPTION B; technical contract and implementation acceptance pending AD-02–AD-07 and the corresponding engineering gates.
+**Status:** FOUNDER DECISION APPROVED / RECORDED — OPTION B; technical contract and implementation acceptance pending AD-03–AD-07 and the corresponding engineering gates.
 
-## AD-02 — MMO game direction and historical M0 disposition
+## AD-02 — MMO product definition and historical M0 disposition
 
-**Founder direction already expressed:** elevated/isometric shared-world MMO/MMORPG with visible other players, resources and enemies, a readable smaller-character camera and MMO hotbar/social UX. This is a legitimate product target, not a completed large-scale deployed MMO or Unreal build.
+**Product decision recorded — 2026-09-25:** MORABEZZA's intended product is a **Cape Verde-inspired shared-world elevated/isometric action-adventure MMORPG**. Each player uses a distinct character and Morabezza remains the central story heroine (AD-01 Option B). This is a product direction, **not** an assertion of an operating large-population MMO, accepted engine runtime or final topology.
 
-**Versioned [game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md):** reconciles that direction with the historical action/life-sandbox, Volta mission, prototype driving, local saves and M0.1/M0.2 obligations without editing or declaring those main-branch artifacts superseded.
+**Volta — RETAIN / LATER MMO QUEST:** adapt the original Praia-arrival introduction into a **later shared-world player-specific story/onboarding quest**, not part of the initial two-client connectivity gate or MMO-S0.1 full vertical slice. Preserve the historic mission concept; its script, Morabezza's direct role and any persistent rewards require separate narrative, AD-04/05 and runtime review. The current development test contact is not a completed Volta quest.
 
-**Founder decision still required:** explicitly approve the candidate as the product-definition baseline and select a controlled disposition for Volta/vehicle gameplay and the prior single-player M0: later MMO features, separate legacy/single-player mode, or explicit retirement. No automatic feature removal, engine change, map conversion, reward/persistence implementation or public README rewrite.
+**Vehicle gameplay — RETAIN / LATER MMO FEATURE:** preserve vehicle entry/driving and possible travel/property progression as later MMO content, with a separately accepted server-authoritative vehicle/ownership/replication contract. No first-slice vehicle requirement and no separately authorized legacy single-player release.
 
-**Status:** MMO/ISOMETRIC DIRECTION RECORDED / FORMAL AD-02 SCOPE AND HISTORICAL-M0 DISPOSITION PENDING.
+**Original M0.1/M0.2:** those third-person/life-sandbox milestone requirements remain historical source/evidence. The prospective MMORPG acceptance path is the bounded MMO slice and later approved features. Preserve the original `README.md`, `Docs/GAME_DESIGN.md`, historical issue and binary assets until an explicit, separately reviewed milestone/public-documentation migration; do not claim original M0 completion or delete its scope silently.
+
+**Decision evidence:** [AD-02 formal product-definition and legacy-scope record](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/AD_02_MMO_PRODUCT_DEFINITION_AND_LEGACY_SCOPE_DECISION_2026_09_25.md); [MORABEZZA game product-definition candidate](https://github.com/node63labs/morabezza-game/blob/review/rm-02-architecture-decision-docket-20260925/Docs/RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md). Both remain on the draft review branch, without approved governance `main` incorporation or implementation approval.
+
+**Status:** AD-02 PRODUCT-DIRECTION / LEGACY-SCOPE DECISION RECORDED; downstream AD-03–AD-07, roadmap integration and gameplay acceptance PENDING.
 
 ## AD-03 — Dedicated server topology and first-zone boundary
 
@@ -81,7 +85,7 @@
 ## Implementation sequence and review handoff
 
 1. Incorporate the founder-recorded PC-01 independent-game decision into the **approved** governance baseline through its separate controlled review; game priority/capacity remain undecided. This cannot be replaced by approving a code PR.
-2. Apply founder-recorded AD-01 Option B to product-definition planning and resolve AD-02 before definitive character/camera/product changes. Retain historical single-player docs until the signed-off migration delta exists.
+2. Apply AD-01 Option B and the recorded AD-02 MMO/Volta/vehicle disposition to a separately reviewed product-documentation and milestone migration. Retain historical single-player docs until the migration is reviewed; do not treat the new camera/character/gameplay code as accepted.
 3. Resolve AD-03/05 to scope **S0-W2 character/session identity and single-zone admission**. S0-W1a/b/c already contain draft dev-contact server RPC and HUD changes; no duplicate implementation or acceptance by renaming.
 4. Resolve AD-04 before durable rewards, inventory or database work. Resolve AD-06 before map/Unreal runtime tests. Resolve AD-07 before redistributing unverified engine/artist assets or shipping.
 5. Review the separate public configuration token field under the appropriate security/change-control procedure; do not quote the value in PRs, logs or prompts. Its validity has not been proven.
@@ -89,7 +93,7 @@
 
 ## Approval record template — not yet signed
 
-- Decision ID: [PC-01 / AD-01 … AD-07; PC-01 and AD-01 founder choices recorded]
+- Decision ID: [PC-01 / AD-01 … AD-07; PC-01, AD-01 and AD-02 product choices recorded]
 - Approved alternative and explicit exclusions: [owner to provide]
 - Effective approved source document/version and commit: [owner to provide]
 - Accountable product owner / independent reviewer: [owner to provide]
@@ -98,4 +102,4 @@
 - Approval date / reviewer identity: [owner to provide]
 - Resulting allowed implementation PR and acceptance criteria: [owner to provide]
 
-**PC-01 and AD-01 founder choices are recorded. The approved portfolio-baseline incorporation of PC-01, formal AD-02–AD-07 decisions and any implementation-specific acceptance remain PENDING.**
+**PC-01, AD-01 and AD-02 product decisions are recorded. PC-01 approved portfolio-baseline incorporation, AD-03–AD-07 architecture decisions, historical public-documentation migration and all implementation-specific acceptance remain PENDING.**
