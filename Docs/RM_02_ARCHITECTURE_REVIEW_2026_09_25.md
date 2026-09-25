@@ -1,6 +1,7 @@
 # RM-02 — MORABEZZA MMO Architecture Review (2026-09-25)
 
 **Disposition: SOURCE REVIEW COMPLETE; ARCHITECTURE APPROVAL ON HOLD.**
+**PC-01 subsequent disposition (2026-09-25): FOUNDER DECISION RECORDED — MORABEZZA is an independent NODE63 game product. The approved portfolio charter has NOT yet been amended; AD-01–AD-07 and the remaining architecture acceptance gates are still pending.**
 **Scope:** Documentation and source review only. No game code, map, LFS object, repository setting or production service changed.
 **Review baseline:** draft PR #3 at bf50e288f7be71b772b90826a25d75a96587d44c; its audited game main at af8f3d0e5f9291b1358232c7055190e4bd57b9f6.
 **Later source inspected independently:** draft PR #11 at 155168e7b29e521f59cc64bfd0e2b5274c3790ed. PR #11 is NOT an ancestor of PR #3.
@@ -12,7 +13,7 @@ The approved Portfolio Charter v1.0 defines **Morabeza as a hospitality-oriented
 
 The project-provided NODE63 Master Roadmap v1.4 and Ecosystem/Product Boundaries v1.1 are explicitly **draft revisions requiring founder approval**. The roadmap discusses Morabeza P5, not a separately registered MORABEZZA game. Do not silently treat those drafts as an approved portfolio amendment or silently transfer hospitality product authority to game character data.
 
-**PC-01 — Required founder decision:** classify MORABEZZA as a distinct registered game product, an expressly approved subproject of existing Morabeza, or another expressly named initiative. Record its product owner, repository, authority boundary, roadmap and permitted implementation scope in the appropriate versioned governance change. This review does not make that decision or approve extra portfolio capacity.
+**PC-01 — founder decision recorded 2026-09-25:** MORABEZZA is a separate NODE63 game product, **not** a subproject of the Morabeza hospitality product. The [founder decision record](https://github.com/node63labs/node63-governance/blob/governance/pc-01-morabezza-independent-game-20260925/portfolio/decisions/PC_01_MORABEZZA_INDEPENDENT_GAME_2026_09_25.md) is on a separate governance branch. The existing approved charter remains unchanged pending controlled incorporation; no game roadmap priority, staffing or implementation authority has been assigned.
 
 ## 2. What the RM-02 candidate proposes, without accepting implementation
 
@@ -40,7 +41,7 @@ The original PR #3 docs and later PR #11 code have different Git ancestry. PRs #
 
 | ID | Review item | Required resolution |
 | --- | --- | --- |
-| GOV-01 | Approved hospitality-product charter versus unregistered game identity. | Resolve PC-01, document product authority and portfolio scope. |
+| GOV-01 | Approved hospitality-product charter does not yet contain the game. | PC-01 founder choice resolved as **independent game product**; incorporate it into a controlled approved portfolio revision before asserting registered product status, roadmap priority or implementation authorization. |
 | PROD-01 | Old single-player/life-sandbox definition versus proposed MMORPG and named protagonist. | Approve AD-01 and AD-02, preserving historical requirements and explicit deferrals. |
 | NET-01 | One-zone two-player experiment versus unspecified single-/multi-shard production topology. | AD-03 must distinguish the first disposable test-zone topology from any later shard transfer; no invented population or performance targets. |
 | ID-01 | Unreal controller ownership is not account-to-character authorization. No ticket issuer/verifier, revocation, session fencing or reconnect contract evidenced in inspected game source. | AD-05: product-owned account and character binding, audience-bound short-lived ticket, exact zone/session revision, nonce/replay rejection, revocation, reconnect and mismatched-owner negative tests. Production authentication remains a separate gate. |
@@ -54,7 +55,7 @@ The original PR #3 docs and later PR #11 code have different Git ancestry. PRs #
 
 ## 5. Plan reconciliation, not an implicit implementation authorization
 
-The candidate implementation order predates W1a/W1b/W1c. The later draft branches already contain **development-contact** server RPC and local HUD lifecycle candidates. Do not relabel them as authenticated MMO interaction or duplicate that scope in S0-W2. Following explicit PC-01 and affected AD decisions, propose S0-W2 as **character/session identity and single-zone admission**, reserving authoritative persistence and rewards for a separately approved S0-W3.
+The candidate implementation order predates W1a/W1b/W1c. The later draft branches already contain **development-contact** server RPC and local HUD lifecycle candidates. Do not relabel them as authenticated MMO interaction or duplicate that scope in S0-W2. Following incorporation of the recorded PC-01 decision into approved governance and approval of the affected AD decisions, propose S0-W2 as **character/session identity and single-zone admission**, reserving authoritative persistence and rewards for a separately approved S0-W3.
 
 The first complete MMORPG slice in PR #3 additionally proposes one resource, one NPC, one enemy and one durable reward. The current draft source only establishes a test-contact dialogue candidate, not that vertical slice. Preserve both descriptions with their evidence scope.
 
@@ -66,7 +67,7 @@ A versioned product-definition delta must reconcile the proposed camera/avatar d
 
 **Not performed:** founder/portfolio decision, canonical map selection, identity service, database creation, security remediation, engine build, LFS hydration on a new machine, game launch, network test, or GitHub Actions.
 
-**Review result:** technical architecture candidate retained for founder decision, with PC-01 as the initial governance blocker and AD-01–AD-07 pending. This document and its companion decision register are review artifacts, not approvals. The source PR #3 documents, gameplay source and main remain unchanged.
+**Review result (updated 2026-09-25):** PC-01 founder classification is recorded as an independent game product; its incorporation into the approved portfolio charter and AD-01–AD-07 remain pending. Technical architecture approval, Unreal compilation and gameplay acceptance remain on hold. The original PR #3 documents, gameplay source and `main` remain unchanged.
 
 - [Original architecture candidate in PR #3](https://github.com/node63labs/morabezza-game/blob/design/rm-02-mmo-architecture-candidate/Docs/RM_02_MMO_RUNTIME_ARCHITECTURE_V1_CANDIDATE.md)
 - [Original source-migration register in PR #3](https://github.com/node63labs/morabezza-game/blob/design/rm-02-mmo-architecture-candidate/Docs/RM_02_SOURCE_MIGRATION_AND_REMOTE_WORK_PLAN.md)
