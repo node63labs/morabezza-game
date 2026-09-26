@@ -1,3 +1,12 @@
+> **HISTORICAL DESIGN SNAPSHOT — retained for provenance (public-documentation migration candidate, 2026-09-26).**  
+> This file records the original third-person action/life-sandbox concept and M0.1 Praia/Volta/vehicle/save-game goals. It is **not** the prospective acceptance contract for the newly scoped MORABEZZA MMORPG or evidence that those historical criteria passed. The tracked Unreal project declares **Engine 5.8**; the older UE 5.6 milestone remains visible in [Issue #1](https://github.com/node63labs/morabezza-game/issues/1) until separately dispositioned.
+>
+> The founder-recorded [AD-01](AD_01_PLAYER_CHARACTERS_AND_STORY_HEROINE_DECISION_2026_09_25.md) distinguishes player-owned characters from Morabezza, the central story heroine. [AD-02](AD_02_MMO_PRODUCT_DEFINITION_AND_LEGACY_SCOPE_DECISION_2026_09_25.md) retains Volta and vehicles as **later MMO features**, outside the initial two-client and proposed MMO-S0.1 gates. See the [current game product-definition candidate](RM_02_GAME_PRODUCT_DEFINITION_V1_CANDIDATE_2026_09_25.md) and [milestone transition proposal](MORABEZZA_MILESTONE_TRANSITION_2026_09_26_CANDIDATE.md). These decisions are recorded on draft [RM-02 review PR #12](https://github.com/node63labs/morabezza-game/pull/12); repository and governance merge gates remain open.
+>
+> **Everything below this notice is preserved without alteration as historical source material.** No separate legacy single-player release is authorized by this notice.
+
+---
+
 # MORABEZA — Game Design Foundation
 
 ## 1. Vision
