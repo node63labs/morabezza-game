@@ -120,8 +120,37 @@ jobs:
       - name: Gitleaks 8.30.1 committed-history scan
         shell: bash
         run: |
-          set -euo pipefail
+          set -uo pipefail
+          report="$RUNNER_TEMP/gitleaks-report.json"
+          rm -f "$report"
+
+          set +e
           docker run --rm \
             -v "$PWD:/repo" \
+            -v "$RUNNER_TEMP:/out" \
             zricethezav/gitleaks:v8.30.1 \
-            git /repo --no-banner --redact --exit-code 1
+            git /repo --no-banner --redact --exit-code 1 \
+            --report-format json --report-path /out/gitleaks-report.json
+          status=$?
+          set -e
+
+          if [ -s "$report" ]; then
+            REPORT_PATH="$report" python3 - <<'PY'
+          import json
+          import os
+
+          with open(os.environ["REPORT_PATH"], "r", encoding="utf-8") as handle:
+              findings = json.load(handle)
+
+          for finding in findings:
+              print(
+                  "GITLEAKS_FINDING "
+                  f"rule={finding.get('RuleID', 'unknown')} "
+                  f"file={finding.get('File', 'unknown')} "
+                  f"commit={finding.get('Commit', 'unknown')} "
+                  f"line={finding.get('StartLine', 'unknown')}"
+              )
+          PY
+          fi
+
+          exit "$status"
