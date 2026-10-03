@@ -148,7 +148,8 @@ jobs:
                   f"rule={finding.get('RuleID', 'unknown')} "
                   f"file={finding.get('File', 'unknown')} "
                   f"commit={finding.get('Commit', 'unknown')} "
-                  f"line={finding.get('StartLine', 'unknown')}"
+                  f"line={finding.get('StartLine', 'unknown')} "
+                  f"fingerprint={finding.get('Fingerprint', 'unknown')}"
               )
           PY
           fi
