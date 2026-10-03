@@ -1,0 +1,163 @@
+name: MORABEZZA Repository CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  repository-validation:
+    name: Repository Validation
+    runs-on: ubuntu-latest
+    env:
+      EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.EXPECTED_SHA }}
+          fetch-depth: 0
+          lfs: false
+
+      - name: Verify exact source binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_SHA"
+          printf 'EXACT_SOURCE_SHA=%s\n' "$actual"
+
+      - name: Git whitespace validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            git diff --check "$base...HEAD"
+          else
+            before="${{ github.event.before }}"
+            if [ -n "$before" ] && [ "$before" != "0000000000000000000000000000000000000000" ]; then
+              git diff --check "$before..HEAD"
+            else
+              git diff --check HEAD^..HEAD
+            fi
+          fi
+
+      - name: Shell syntax validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=0
+          while IFS= read -r -d '' script; do
+            bash -n "$script"
+            count=$((count + 1))
+          done < <(git ls-files -z '*.sh')
+          printf 'SHELL_FILES_VALIDATED=%s\n' "$count"
+
+      - name: Python syntax validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=0
+          while IFS= read -r -d '' source; do
+            python3 -m py_compile "$source"
+            count=$((count + 1))
+          done < <(git ls-files -z '*.py')
+          printf 'PYTHON_FILES_VALIDATED=%s\n' "$count"
+
+      - name: JSON and Unreal project descriptor validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import subprocess
+
+          raw = subprocess.check_output(
+              ["git", "ls-files", "-z", "*.json", "*.uproject"],
+          )
+          paths = [p.decode() for p in raw.split(b"\0") if p]
+          for path in paths:
+              with open(path, "r", encoding="utf-8") as handle:
+                  json.load(handle)
+          print(f"JSON_DESCRIPTORS_VALIDATED={len(paths)}")
+          PY
+
+      - name: Repository boundary assertion
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f README.md
+          test -f MORABEZA.uproject
+          test -f .gitleaks.toml
+          test ! -e .env
+          test ! -e secrets
+          test ! -e credentials
+          grep -q '^bEnablePlugin=False$' Config/DefaultEngine.ini
+          grep -q '^bAllowNetworkConnection=False$' Config/DefaultEngine.ini
+          grep -q '^SecurityToken=$' Config/DefaultEngine.ini
+          printf 'MORABEZZA_REPOSITORY_BOUNDARY=VERIFIED\n'
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    env:
+      EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ env.EXPECTED_SHA }}
+          fetch-depth: 0
+          lfs: false
+
+      - name: Verify exact source binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_SHA"
+          printf 'EXACT_SOURCE_SHA=%s\n' "$actual"
+
+      - name: Gitleaks 8.30.1 committed-history scan
+        shell: bash
+        run: |
+          set -uo pipefail
+          report="$RUNNER_TEMP/gitleaks-report.json"
+          rm -f "$report"
+
+          set +e
+          docker run --rm \
+            -v "$PWD:/repo" \
+            -v "$RUNNER_TEMP:/out" \
+            zricethezav/gitleaks:v8.30.1 \
+            git /repo --no-banner --redact --exit-code 1 \
+            --config /repo/.gitleaks.toml \
+            --report-format json --report-path /out/gitleaks-report.json
+          status=$?
+          set -e
+
+          if [ -s "$report" ]; then
+            REPORT_PATH="$report" python3 - <<'PY'
+          import json
+          import os
+
+          with open(os.environ["REPORT_PATH"], "r", encoding="utf-8") as handle:
+              findings = json.load(handle)
+
+          for finding in findings:
+              print(
+                  "GITLEAKS_FINDING "
+                  f"rule={finding.get('RuleID', 'unknown')} "
+                  f"file={finding.get('File', 'unknown')} "
+                  f"commit={finding.get('Commit', 'unknown')} "
+                  f"line={finding.get('StartLine', 'unknown')}"
+              )
+          PY
+          fi
+
+          exit "$status"
