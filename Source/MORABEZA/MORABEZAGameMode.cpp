@@ -5,106 +5,96 @@
 #include "MORABEZAContactActor.h"
 
 #include "Engine/World.h"
+#include "GameFramework/Controller.h"
+#include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
 
 AMORABEZAGameMode::AMORABEZAGameMode()
 {
     DefaultPawnClass = AMORABEZACharacter::StaticClass();
-
     HUDClass = AMORABEZAHUD::StaticClass();
 }
 
-void AMORABEZAGameMode::BeginPlay()
+void AMORABEZAGameMode::RestartPlayer(AController* NewPlayer)
 {
-    Super::BeginPlay();
+    // AGameModeBase exists only on the authoritative game server.
+    // The base method attempts to create/possess this player's pawn.
+    Super::RestartPlayer(NewPlayer);
 
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT("MORABEZA GAMEMODE: BeginPlay.")
-    );
+    APlayerController* PlayerController = Cast<APlayerController>(NewPlayer);
+    if (!IsValid(PlayerController) || !IsValid(PlayerController->GetPawn()))
+    {
+        UE_LOG(
+            LogTemp,
+            Warning,
+            TEXT("MORABEZA GAMEMODE: No player pawn after RestartPlayer.")
+        );
+        return;
+    }
 
-    SpawnTestContact();
+    const TWeakObjectPtr<AController> Key(NewPlayer);
+
+    // Respawn should not leave duplicate private test contacts behind.
+    if (TWeakObjectPtr<AMORABEZAContactActor>* Existing =
+            TestContactsByController.Find(Key))
+    {
+        if (AMORABEZAContactActor* PreviousContact = Existing->Get())
+        {
+            PreviousContact->Destroy();
+        }
+        TestContactsByController.Remove(Key);
+    }
+
+    SpawnTestContact(PlayerController);
 }
 
-void AMORABEZAGameMode::SpawnTestContact()
+void AMORABEZAGameMode::Logout(AController* Exiting)
+{
+    const TWeakObjectPtr<AController> Key(Exiting);
+    if (TWeakObjectPtr<AMORABEZAContactActor>* Existing =
+            TestContactsByController.Find(Key))
+    {
+        if (AMORABEZAContactActor* Contact = Existing->Get())
+        {
+            Contact->Destroy();
+        }
+        TestContactsByController.Remove(Key);
+    }
+
+    Super::Logout(Exiting);
+}
+
+void AMORABEZAGameMode::SpawnTestContact(APlayerController* PlayerController)
 {
     UWorld* World = GetWorld();
-
-    if (!World)
-    {
-        UE_LOG(
-            LogTemp,
-            Error,
-            TEXT("MORABEZA GAMEMODE: World is NULL.")
-        );
-
-        return;
-    }
-
-    APlayerController* PlayerController =
-        World->GetFirstPlayerController();
-
-    if (!PlayerController)
-    {
-        UE_LOG(
-            LogTemp,
-            Error,
-            TEXT("MORABEZA GAMEMODE: PlayerController is NULL.")
-        );
-
-        return;
-    }
-
     APawn* PlayerPawn =
-        PlayerController->GetPawn();
+        IsValid(PlayerController) ? PlayerController->GetPawn() : nullptr;
 
-    if (!PlayerPawn)
+    if (!IsValid(World) || !IsValid(PlayerPawn))
     {
         UE_LOG(
             LogTemp,
-            Error,
-            TEXT("MORABEZA GAMEMODE: PlayerPawn is NULL.")
+            Warning,
+            TEXT("MORABEZA GAMEMODE: Cannot spawn per-player test contact.")
         );
-
         return;
     }
 
-    FVector CameraLocation;
-    FRotator CameraRotation;
-
-    PlayerController->GetPlayerViewPoint(
-        CameraLocation,
-        CameraRotation
-    );
-
-    /*
-     * Spawn the test contact in the direction the
-     * player is actually looking.
-     */
-    FVector ViewDirection =
-        CameraRotation.Vector();
-
-    /*
-     * Project the camera direction onto the horizontal
-     * plane so the test contact stays near ground level.
-     */
-    ViewDirection.Z = 0.0f;
-
-    if (ViewDirection.IsNearlyZero())
+    // The dedicated server has no reliable local gameplay-camera viewpoint.
+    // Place the private test contact relative to THIS player's pawn.
+    FVector Forward = PlayerPawn->GetActorForwardVector();
+    Forward.Z = 0.0f;
+    if (!Forward.Normalize())
     {
-        ViewDirection =
-            PlayerPawn->GetActorForwardVector();
+        Forward = FVector::ForwardVector;
     }
-
-    ViewDirection.Normalize();
 
     const FVector SpawnLocation =
-        PlayerPawn->GetActorLocation() +
-        ViewDirection * 250.0f;
+        PlayerPawn->GetActorLocation() + Forward * 250.0f;
 
     FActorSpawnParameters SpawnParams;
-
+    SpawnParams.Owner = PlayerController;
+    SpawnParams.Instigator = PlayerPawn;
     SpawnParams.SpawnCollisionHandlingOverride =
         ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
@@ -116,57 +106,33 @@ void AMORABEZAGameMode::SpawnTestContact()
             SpawnParams
         );
 
-    if (!Contact)
+    if (!IsValid(Contact))
     {
         UE_LOG(
             LogTemp,
-            Error,
-            TEXT(
-                "MORABEZA GAMEMODE: Failed to spawn test contact."
-            )
+            Warning,
+            TEXT("MORABEZA GAMEMODE: Test contact spawn failed.")
         );
-
         return;
     }
 
-    Contact->ContactName =
-        FText::FromString(TEXT("Test Contact"));
+    Contact->ContactName = FText::FromString(TEXT("Test Contact"));
+    Contact->MissionId = TEXT("TEST_INTERACTION");
 
-    Contact->MissionId =
-        TEXT("TEST_INTERACTION");
+    // This is a DEVELOPMENT-ONLY actor: each connection sees its own test
+    // contact; it is not a shared quest object or a trusted reward source.
+    Contact->bOnlyRelevantToOwner = true;
+    Contact->SetReplicates(true);
 
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA GAMEMODE: TEST CONTACT SPAWNED."
-        )
+    TestContactsByController.Add(
+        TWeakObjectPtr<AController>(PlayerController),
+        TWeakObjectPtr<AMORABEZAContactActor>(Contact)
     );
 
     UE_LOG(
         LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA GAMEMODE: Camera Location=%s"
-        ),
-        *CameraLocation.ToString()
-    );
-
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA GAMEMODE: Camera Rotation=%s"
-        ),
-        *CameraRotation.ToString()
-    );
-
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT(
-            "MORABEZA GAMEMODE: Test Contact Location=%s"
-        ),
-        *Contact->GetActorLocation().ToString()
+        Log,
+        TEXT("MORABEZA GAMEMODE: Spawned owner-only test contact for %s."),
+        *PlayerController->GetName()
     );
 }
