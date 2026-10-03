@@ -7,5 +7,5 @@ useDefault = true
 description = "Known historical Android File Server token finding after current source neutralization"
 targetRules = ["generic-api-key"]
 condition = "AND"
-commits = ["^b9e00c4599ee4ebad4c6f4255761feb80b21d350$"]
+commits = ["b9e00c4599ee4ebad4c6f4255761feb80b21d350"]
 paths = ['''^Config/DefaultEngine\.ini$''']
